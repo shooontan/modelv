@@ -1,4 +1,6 @@
-module.exports = {
+const withTM = require('next-transpile-modules')(['three/examples/jsm']);
+
+module.exports = withTM({
   webpack: (config) => {
     return {
       ...config,
@@ -8,4 +10,4 @@ module.exports = {
       },
     };
   },
-};
+});

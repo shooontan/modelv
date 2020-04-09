@@ -1,10 +1,15 @@
 import React from 'react';
+import Link from 'next/link';
 import { Video } from '../components/Vtuber';
 
 function Home() {
   return (
     <div>
-      <p>HOME PAGE is here!</p>
+      <p>
+        <Link href="/mmd">
+          <a>mmd</a>
+        </Link>
+      </p>
       <Video />
     </div>
   );
