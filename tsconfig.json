@@ -1,0 +1,24 @@
+{
+  "extends": "@shooontan/tsconfig",
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es2018",
+    "lib": [
+      "es2018",
+      "DOM"
+    ],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "module": "esnext",
+    "isolatedModules": true,
+    "jsx": "preserve"
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}
