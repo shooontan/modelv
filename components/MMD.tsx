@@ -3,13 +3,18 @@ import Link from 'next/link';
 import * as THREE from 'three';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
+import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHelper';
 import { GUI } from 'dat.gui';
+
+const CANVAS_WIDTH = 720;
+const CANVAS_HEIGHT = 560;
 
 let camera: THREE.PerspectiveCamera;
 let scene: THREE.Scene;
 let renderer: THREE.WebGLRenderer;
 let effect: OutlineEffect;
 let mesh: THREE.SkinnedMesh;
+let helper: MMDAnimationHelper;
 
 export default () => {
   const divRef = React.useRef<HTMLDivElement>(null);
@@ -18,7 +23,7 @@ export default () => {
   const Init = React.useCallback(() => {
     camera = new THREE.PerspectiveCamera(
       40,
-      window.innerWidth / window.innerHeight,
+      CANVAS_WIDTH / CANVAS_HEIGHT,
       1,
       1000
     );
@@ -38,13 +43,14 @@ export default () => {
       canvas: canvasRef?.current || undefined,
     });
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0xcccccc, 0);
 
     effect = new OutlineEffect(renderer, {});
   }, []);
 
   const LoadModel = React.useCallback(() => {
+    helper = new MMDAnimationHelper();
+
     const modelFile = '/models/mmd/model/model.pmx';
 
     const loader = new MMDLoader();
@@ -70,6 +76,7 @@ export default () => {
       }
     );
 
+    // @ts-ignore
     const initGui = () => {
       const gui = new GUI();
       const dictionary = mesh.morphTargetDictionary;
@@ -77,11 +84,42 @@ export default () => {
       var controls: { [key: string]: number } = {};
       var keys: string[] = [];
 
+      const mcontrols: { [key: string]: number } = {};
+      const mkeys = {
+        'head-trans-x': {},
+        'head-trans-y': {},
+        'head-trans-z': {},
+        'head-quat-x': {},
+        'head-quat-y': {},
+        'head-quat-z': {},
+        'head-quat-w': {},
+        'head-rotate-x': {
+          min: -90,
+          max: 90,
+          step: 1,
+        },
+        'head-rotate-y': {
+          min: -90,
+          max: 90,
+          step: 1,
+        },
+        'head-rotate-z': {
+          min: -90,
+          max: 90,
+          step: 1,
+        },
+      };
+
       var morphs = gui.addFolder('Morphs');
+      var motion = gui.addFolder('Motion');
 
       function initControls() {
         for (var key in dictionary) {
           controls[key] = 0.0;
+        }
+
+        for (var key in mkeys) {
+          mcontrols[key] = 0.0;
         }
       }
 
@@ -97,6 +135,18 @@ export default () => {
         }
       }
 
+      function initMotion() {
+        for (var key in mkeys) {
+          // @ts-ignore
+          const min: number = mkeys[key]?.min || -1;
+          // @ts-ignore
+          const max: number = mkeys[key]?.max || 1;
+          // @ts-ignore
+          const step: number = mkeys[key]?.step || 0.01;
+          motion.add(mcontrols, key, min, max, 0.01).onChange(onChangePose);
+        }
+      }
+
       function onChangeMorph() {
         for (var i = 0; i < keys.length; i++) {
           var key = keys[i];
@@ -105,13 +155,46 @@ export default () => {
         }
       }
 
+      function onChangePose() {
+        const x = mcontrols['head-rotate-x'] / 180;
+        const y = mcontrols['head-rotate-y'] / 180;
+        const z = mcontrols['head-rotate-z'] / 180;
+
+        const quaternion = new THREE.Quaternion();
+        quaternion.setFromEuler(new THREE.Euler(x, y, z));
+
+        const vpd = {
+          bones: [
+            {
+              name: '頭',
+              translation: [
+                mcontrols['head-trans-x'],
+                mcontrols['head-trans-y'],
+                mcontrols['head-trans-z'],
+              ],
+              quaternion: [
+                quaternion.x,
+                quaternion.y,
+                quaternion.z,
+                quaternion.w,
+              ],
+            },
+          ],
+        };
+
+        helper.pose(mesh, vpd);
+      }
+
       initControls();
       initKeys();
       initMorphs();
+      initMotion();
 
       onChangeMorph();
+      onChangePose();
 
-      morphs.open();
+      // morphs.open();
+      motion.open();
     };
   }, []);
 
@@ -137,7 +220,7 @@ export default () => {
         <a>top</a>
       </Link>
       <div ref={divRef}></div>
-      <canvas ref={canvasRef}></canvas>
+      <canvas ref={canvasRef} width="720" height="560"></canvas>
     </div>
   );
 };
