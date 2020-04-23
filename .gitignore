@@ -1,3 +1,6 @@
 node_modules
 public/models
 .next
+snapweb_js
+opencv
+public/js
