@@ -12,7 +12,9 @@ type LandmarkName =
   | 'rightEye'
   | 'jaw'
   | 'leftMouth'
-  | 'rightMouth';
+  | 'rightMouth'
+  | 'leftOutline'
+  | 'rightOutline';
 
 // @ts-ignore
 const kfilter = {
@@ -28,6 +30,14 @@ const kfilter = {
     y: new KalmanFilter({ R: 0.2 }),
   },
   rightMouth: {
+    x: new KalmanFilter({ R: 0.2 }),
+    y: new KalmanFilter({ R: 0.2 }),
+  },
+  leftOutline: {
+    x: new KalmanFilter({ R: 0.2 }),
+    y: new KalmanFilter({ R: 0.2 }),
+  },
+  rightOutline: {
     x: new KalmanFilter({ R: 0.2 }),
     y: new KalmanFilter({ R: 0.2 }),
   },
@@ -125,6 +135,8 @@ export const Camera = () => {
       const jaw = landmarks.getJawOutline()[8];
       const leftMouth = landmarks.getMouth()[0];
       const rightMouth = landmarks.getMouth()[6];
+      const leftOutline = landmarks.getJawOutline()[0];
+      const rightOutline = landmarks.getJawOutline()[16];
       setPoints({
         nose: formatPoint('nose', nose),
         leftEye: formatPoint('leftEye', leftEye),
@@ -132,6 +144,8 @@ export const Camera = () => {
         jaw: formatPoint('jaw', jaw),
         leftMouth: formatPoint('leftMouth', leftMouth),
         rightMouth: formatPoint('rightMouth', rightMouth),
+        leftOutline: formatPoint('leftOutline', leftOutline),
+        rightOutline: formatPoint('rightOutline', rightOutline),
       });
     }
   }, [cameraActive]);

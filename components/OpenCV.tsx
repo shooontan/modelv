@@ -34,6 +34,10 @@ export const OpenCV = () => {
       // right mouth
       // ...[99, -99, -45],
       ...[150, -150, -125],
+      // left outline
+      ...[-480, 170, -340],
+      // right outline
+      ...[480, 170, -340],
     ];
     const rows = detectPoints.length / 3;
     const modelPoints = cv.matFromArray(rows, 3, cv.CV_64FC1, detectPoints);
@@ -56,9 +60,27 @@ export const OpenCV = () => {
     const rvec = new cv.Mat({ width: 1, height: 3 }, cv.CV_64FC1);
     const tvec = new cv.Mat({ width: 1, height: 3 }, cv.CV_64FC1);
 
-    const { nose, leftMouth, rightMouth, jaw, leftEye, rightEye } = points;
+    const {
+      nose,
+      leftMouth,
+      rightMouth,
+      jaw,
+      leftEye,
+      rightEye,
+      leftOutline,
+      rightOutline,
+    } = points;
 
-    if (nose && leftMouth && rightMouth && jaw && leftEye && rightEye) {
+    if (
+      nose &&
+      leftMouth &&
+      rightMouth &&
+      jaw &&
+      leftEye &&
+      rightEye &&
+      leftOutline &&
+      rightOutline
+    ) {
       [
         ...nose,
         ...jaw,
@@ -66,6 +88,8 @@ export const OpenCV = () => {
         ...rightEye,
         ...leftMouth,
         ...rightMouth,
+        ...leftOutline,
+        ...rightOutline,
       ].map((v, i) => {
         imagePoints.data64F[i] = v;
       });

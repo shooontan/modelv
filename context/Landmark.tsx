@@ -10,6 +10,8 @@ type Points = {
   leftMouth?: Point;
   rightMouth?: Point;
   jaw?: Point;
+  leftOutline?: Point;
+  rightOutline?: Point;
 };
 
 const usePoints = () => React.useState<Points>({});
