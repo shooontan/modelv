@@ -4,6 +4,7 @@ import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
 import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHelper';
 import { HeadPose } from '../context/HeadPose';
+import { Landmark } from '../context/Landmark';
 
 const CANVAS_SIZE = [640, 480] as const;
 
@@ -78,6 +79,7 @@ export default () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
+  const [points] = Landmark.Points.useContainer();
 
   React.useEffect(() => {
     if (!eulerAngles || !mesh) {
@@ -104,8 +106,25 @@ export default () => {
       ],
     };
 
+    // morph
+    const { upperLip, lowerLip, leftMouth, rightMouth } = points;
+    if (upperLip && lowerLip && leftMouth && rightMouth) {
+      const dicAIndex = mesh.morphTargetDictionary?.['あ'];
+      if (typeof dicAIndex === 'number' && mesh.morphTargetInfluences) {
+        const disth = Math.sqrt(
+          (leftMouth[0] - rightMouth[0]) ** 2 +
+            (leftMouth[1] - rightMouth[1]) ** 2
+        );
+        const distv = Math.sqrt(
+          (upperLip[0] - lowerLip[0]) ** 2 + (upperLip[1] - lowerLip[1]) ** 2
+        );
+        // あ
+        mesh.morphTargetInfluences[dicAIndex] = Math.min(distv / disth, 1);
+      }
+    }
+
     helper.pose(mesh, vpd);
-  }, [eulerAngles]);
+  }, [eulerAngles, points]);
 
   React.useEffect(() => {
     initCanvas({

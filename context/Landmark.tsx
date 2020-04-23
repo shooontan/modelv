@@ -9,6 +9,8 @@ type Points = {
   rightEye?: Point;
   leftMouth?: Point;
   rightMouth?: Point;
+  upperLip?: Point;
+  lowerLip?: Point;
   jaw?: Point;
   leftOutline?: Point;
   rightOutline?: Point;
