@@ -80,19 +80,19 @@ export default () => {
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
 
   React.useEffect(() => {
-    if (!eulerAngles) {
+    if (!eulerAngles || !mesh) {
       return;
     }
 
     const x =
       ((180 - Math.abs(eulerAngles.pitch)) / 180) *
-      (eulerAngles.pitch < 0 ? 1 : -1) *
-      3;
-    const y = eulerAngles.yaw / 180;
-    const z = eulerAngles.roll / 180;
+      -Math.sign(eulerAngles.pitch) *
+      4;
+    const y = eulerAngles.yaw / 90;
+    const z = eulerAngles.roll / 90;
 
     const quaternion = new THREE.Quaternion();
-    quaternion.setFromEuler(new THREE.Euler(x, y, z));
+    quaternion.setFromEuler(new THREE.Euler(x, y, z, 'XYZ'));
 
     const vpd = {
       bones: [
@@ -126,8 +126,24 @@ export default () => {
   return (
     <div>
       <p>
-        yaw: {eulerAngles?.yaw}, pitch: {eulerAngles?.pitch}, roll:
-        {eulerAngles?.roll}
+        {eulerAngles && (
+          <>
+            <span style={{ color: 'green' }}>　yaw: </span>
+            {Math.round(eulerAngles.yaw)}
+          </>
+        )}
+        {eulerAngles && (
+          <>
+            <span style={{ color: 'blue' }}>　pitch: </span>
+            {Math.round(eulerAngles.pitch)}
+          </>
+        )}
+        {eulerAngles && (
+          <>
+            <span style={{ color: 'red' }}>　roll: </span>
+            {Math.round(eulerAngles.roll)}
+          </>
+        )}
       </p>
       <div ref={divRef}></div>
       <canvas ref={canvasRef} width="640" height="480"></canvas>

@@ -24,10 +24,10 @@ export const OpenCV = () => {
       ...[0, -330, -65],
       // left eye
       // ...[-144, 105, -90],
-      ...[-225, 170, -135],
+      ...[-240, 170, -135],
       // right eye
       // ...[144, 105, -90],
-      ...[225, 170, -135],
+      ...[240, 170, -135],
       // left mouth
       // ...[-99, -99, -45],
       ...[-150, -150, -125],
@@ -45,15 +45,9 @@ export const OpenCV = () => {
     };
     const center = [size.width / 2, size.height / 2];
     const cameraMatrix = cv.matFromArray(3, 3, cv.CV_64FC1, [
-      size.width,
-      0,
-      center[0],
-      0,
-      size.width,
-      center[1],
-      0,
-      0,
-      1,
+      ...[size.width, 0, center[0]],
+      ...[0, size.width, center[1]],
+      ...[0, 0, 1],
     ]);
 
     // image matrix
