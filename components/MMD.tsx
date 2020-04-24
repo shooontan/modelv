@@ -5,6 +5,7 @@ import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
 import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHelper';
 import { HeadPose } from '../context/HeadPose';
 import { Landmark } from '../context/Landmark';
+import { KalmanFilter } from '../libs/KalmanFilter';
 
 const CANVAS_SIZE = [640, 480] as const;
 
@@ -14,6 +15,12 @@ let renderer: THREE.WebGLRenderer;
 let effect: OutlineEffect;
 let mesh: THREE.SkinnedMesh;
 let helper: MMDAnimationHelper;
+
+const kfilter = new KalmanFilter({
+  d: 3,
+  R: 0.01,
+  Q: 3,
+});
 
 function initCanvas({ canvas }: { canvas?: HTMLCanvasElement }) {
   camera = new THREE.PerspectiveCamera(
@@ -93,15 +100,41 @@ export default () => {
     const y = eulerAngles.yaw / 90;
     const z = eulerAngles.roll / 90;
 
-    const quaternion = new THREE.Quaternion();
-    quaternion.setFromEuler(new THREE.Euler(x, y, z, 'XYZ'));
+    const quaternionHead = new THREE.Quaternion();
+    quaternionHead.setFromEuler(new THREE.Euler(x / 2, y / 2, z / 2, 'XYZ'));
+
+    const bodyEuler = kfilter.filter([x, y, z]);
+    const quaternionBody = new THREE.Quaternion();
+    quaternionBody.setFromEuler(
+      new THREE.Euler(
+        bodyEuler[0] / 2,
+        bodyEuler[1] / 2,
+        bodyEuler[2] / 2,
+        'XYZ'
+      )
+    );
 
     const vpd = {
       bones: [
         {
           name: '頭',
           translation: [0, 0, 0],
-          quaternion: [quaternion.x, quaternion.y, quaternion.z, quaternion.w],
+          quaternion: [
+            quaternionHead.x,
+            quaternionHead.y,
+            quaternionHead.z,
+            quaternionHead.w,
+          ],
+        },
+        {
+          name: '上半身',
+          translation: [0, 0, 0],
+          quaternion: [
+            quaternionBody.x,
+            quaternionBody.y,
+            quaternionBody.z,
+            quaternionBody.w,
+          ],
         },
       ],
     };

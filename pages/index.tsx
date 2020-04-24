@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Camera } from '../components/Camera';
 import { Providers } from '../context';
@@ -32,15 +31,6 @@ function Home() {
         ]}
       >
         <div>
-          <p>
-            <Link href="/mmd">
-              <a>mmd</a>
-            </Link>
-            {'  '}
-            <Link href="/opencv">
-              <a>opencv</a>
-            </Link>
-          </p>
           <Camera />
         </div>
 

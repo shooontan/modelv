@@ -1,8 +1,8 @@
 import React from 'react';
 // import '@tensorflow/tfjs-node';
 import * as faceapi from 'face-api.js';
-import KalmanFilter from 'kalmanjs';
 import { Landmark } from '../context/Landmark';
+import { KalmanFilter } from '../libs/KalmanFilter';
 
 const CANVAS_SIZE = [640, 480] as const;
 
@@ -18,39 +18,17 @@ type LandmarkName =
   | 'leftOutline'
   | 'rightOutline';
 
-// @ts-ignore
 const kfilter = {
-  nose: { x: new KalmanFilter({ R: 0.2 }), y: new KalmanFilter({ R: 0.2 }) },
-  leftEye: { x: new KalmanFilter({ R: 0.2 }), y: new KalmanFilter({ R: 0.2 }) },
-  rightEye: {
-    x: new KalmanFilter({ R: 0.2 }),
-    y: new KalmanFilter({ R: 0.2 }),
-  },
-  jaw: { x: new KalmanFilter({ R: 0.2 }), y: new KalmanFilter({ R: 0.2 }) },
-  leftMouth: {
-    x: new KalmanFilter({ R: 0.2 }),
-    y: new KalmanFilter({ R: 0.2 }),
-  },
-  rightMouth: {
-    x: new KalmanFilter({ R: 0.2 }),
-    y: new KalmanFilter({ R: 0.2 }),
-  },
-  upperLip: {
-    x: new KalmanFilter({ R: 0.2 }),
-    y: new KalmanFilter({ R: 0.2 }),
-  },
-  lowerLip: {
-    x: new KalmanFilter({ R: 0.2 }),
-    y: new KalmanFilter({ R: 0.2 }),
-  },
-  leftOutline: {
-    x: new KalmanFilter({ R: 0.2 }),
-    y: new KalmanFilter({ R: 0.2 }),
-  },
-  rightOutline: {
-    x: new KalmanFilter({ R: 0.2 }),
-    y: new KalmanFilter({ R: 0.2 }),
-  },
+  nose: new KalmanFilter(),
+  leftEye: new KalmanFilter(),
+  rightEye: new KalmanFilter(),
+  jaw: new KalmanFilter(),
+  leftMouth: new KalmanFilter(),
+  rightMouth: new KalmanFilter(),
+  upperLip: new KalmanFilter(),
+  lowerLip: new KalmanFilter(),
+  leftOutline: new KalmanFilter(),
+  rightOutline: new KalmanFilter(),
 };
 
 function formatPoint(
@@ -60,8 +38,7 @@ function formatPoint(
   if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
     return undefined;
   }
-  const x = kfilter[name].x.filter(point.x);
-  const y = kfilter[name].y.filter(point.y);
+  const [x, y] = kfilter[name].filter([point.x, point.y]);
   return [x, y];
 }
 
