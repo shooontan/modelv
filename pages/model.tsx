@@ -1,12 +1,11 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Camera } from '../components/Camera';
 import { Providers } from '../context';
 import { Landmark } from '../context/Landmark';
 import { HeadPose } from '../context/HeadPose';
-import { OfferPeerConnection } from '../components/PeerConnection/OfferPeerConnection';
+import { AnswerPeerConnection } from '../components/PeerConnection/AnswerPeerConnection';
 
-const DynamicOpenCV = dynamic(() => import('../components/OpenCV'), {
+const DynamicMMD = dynamic(() => import('../components/MMD'), {
   ssr: false,
 });
 
@@ -22,16 +21,13 @@ function Home() {
           <HeadPose.TranslationVec.Provider key="translation">
             {}
           </HeadPose.TranslationVec.Provider>,
-          <HeadPose.EulerAngles.Provider key="EulerAngles">
+          <HeadPose.EulerAngles.Provider key="eulerangles">
             {}
           </HeadPose.EulerAngles.Provider>,
         ]}
       >
-        <DynamicOpenCV />
-        <div>
-          <Camera />
-        </div>
-        <OfferPeerConnection />
+        <DynamicMMD />
+        <AnswerPeerConnection />
       </Providers>
     </>
   );

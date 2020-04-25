@@ -11,7 +11,7 @@ export const OpenCV = () => {
 
   React.useEffect(() => {
     const cv = window.cv;
-    if (!cv) {
+    if (!cv || !cv.Mat) {
       return;
     }
 
