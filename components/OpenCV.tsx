@@ -7,7 +7,7 @@ export const OpenCV = () => {
   const [points] = Landmark.Points.useContainer();
   const [, setRotation] = HeadPose.RotationVec.useContainer();
   const [, setTranslation] = HeadPose.TranslationVec.useContainer();
-  const [, setEulerAngles] = HeadPose.EulerAngles.useContainer();
+  const [eulerAngles, setEulerAngles] = HeadPose.EulerAngles.useContainer();
 
   React.useEffect(() => {
     const cv = window.cv;
@@ -269,9 +269,31 @@ export const OpenCV = () => {
   }, [points, setEulerAngles, setRotation, setTranslation]);
 
   return (
-    <Head>
-      <script src="/js/opencv.js" type="text/javascript"></script>
-    </Head>
+    <>
+      <Head>
+        <script src="/js/opencv.js" type="text/javascript"></script>
+      </Head>
+      <p>
+        {eulerAngles && (
+          <>
+            <span style={{ color: 'green' }}>{'　yaw: '}</span>
+            {Math.round(eulerAngles.yaw)}
+          </>
+        )}
+        {eulerAngles && (
+          <>
+            <span style={{ color: 'blue' }}>{'　pitch: '}</span>
+            {Math.round(eulerAngles.pitch)}
+          </>
+        )}
+        {eulerAngles && (
+          <>
+            <span style={{ color: 'red' }}>{'　roll: '}</span>
+            {Math.round(eulerAngles.roll)}
+          </>
+        )}
+      </p>
+    </>
   );
 };
 
