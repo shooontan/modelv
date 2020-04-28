@@ -1,11 +1,11 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Providers } from '../context';
-import { Landmark } from '../context/Landmark';
-import { HeadPose } from '../context/HeadPose';
-import { AnswerPeerConnection } from '../components/PeerConnection/AnswerPeerConnection';
+import { Providers } from '@/context';
+import { Landmark } from '@/context/Landmark';
+import { HeadPose } from '@/context/HeadPose';
+import { AnswerPeerConnection } from '@/components/PeerConnection/AnswerPeerConnection';
 
-const DynamicMMD = dynamic(() => import('../components/MMD'), {
+const DynamicMMD = dynamic(() => import('@/components/MMD'), {
   ssr: false,
 });
 

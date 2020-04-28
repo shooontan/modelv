@@ -1,12 +1,12 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Camera } from '../components/Camera';
-import { Providers } from '../context';
-import { Landmark } from '../context/Landmark';
-import { HeadPose } from '../context/HeadPose';
-import { OfferPeerConnection } from '../components/PeerConnection/OfferPeerConnection';
+import { Camera } from '@/components/Camera';
+import { Providers } from '@/context';
+import { Landmark } from '@/context/Landmark';
+import { HeadPose } from '@/context/HeadPose';
+import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnection';
 
-const DynamicOpenCV = dynamic(() => import('../components/OpenCV'), {
+const DynamicOpenCV = dynamic(() => import('@/components/OpenCV'), {
   ssr: false,
 });
 

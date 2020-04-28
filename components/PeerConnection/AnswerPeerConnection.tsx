@@ -1,7 +1,7 @@
 import React from 'react';
-import { HeadPose } from '../../context/HeadPose';
-import { aikotoba } from '../../libs/aikotoba';
-import { usePeerConnection } from '../hooks/usePeer';
+import { HeadPose } from '@/context/HeadPose';
+import { aikotoba } from '@/libs/aikotoba';
+import { usePeerConnection } from '@/components/hooks/usePeer';
 
 type DataFormat = {
   eulerAngles: {
@@ -36,7 +36,7 @@ export const AnswerPeerConnection = () => {
       const data = JSON.parse(e.data) as DataFormat;
       setEulerAngles(data.eulerAngles);
     };
-  }, [dataChannel]);
+  }, [dataChannel, setEulerAngles]);
 
   /**
    * refresh connection
@@ -49,7 +49,7 @@ export const AnswerPeerConnection = () => {
     ) {
       refresh();
     }
-  }, [dataChannel, connectionState]);
+  }, [dataChannel, connectionState, refresh]);
 
   if (dataChannel?.readyState === 'open') {
     return null;

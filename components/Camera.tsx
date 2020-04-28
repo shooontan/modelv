@@ -1,8 +1,8 @@
 import React from 'react';
 // import '@tensorflow/tfjs-node';
 import * as faceapi from 'face-api.js';
-import { Landmark } from '../context/Landmark';
-import { KalmanFilter } from '../libs/KalmanFilter';
+import { Landmark } from '@/context/Landmark';
+import { KalmanFilter } from '@/libs/KalmanFilter';
 
 const CANVAS_SIZE = [640, 480] as const;
 
@@ -140,7 +140,7 @@ export const Camera = () => {
         rightOutline: formatPoint('rightOutline', rightOutline),
       });
     }
-  }, [cameraActive]);
+  }, [cameraActive, setPoints]);
 
   return (
     <>

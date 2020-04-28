@@ -66,52 +66,55 @@ export function usePeerConnection(config: Configuration = defaultConfig) {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [config]);
 
   /**
    * answer
    */
-  const createAnser = React.useCallback(async (offerSDP: string) => {
-    const peer = new RTCPeerConnection(config);
+  const createAnser = React.useCallback(
+    async (offerSDP: string) => {
+      const peer = new RTCPeerConnection(config);
 
-    peer.onicecandidate = (e) => {
-      if (e.candidate === null) {
-        setSDP(peer.localDescription?.sdp);
-      }
-    };
-
-    peer.onconnectionstatechange = () => {
-      console.log(peer.connectionState);
-      setConnectionState(peer.connectionState);
-      if (peer.connectionState === 'disconnected') {
-        peer.close();
-      }
-    };
-
-    const offerDescription = new RTCSessionDescription({
-      type: 'offer',
-      sdp: offerSDP,
-    });
-
-    try {
-      await peer.setRemoteDescription(offerDescription);
-      const sessionDescription = await peer.createAnswer();
-      await peer.setLocalDescription(sessionDescription);
-      setPeerConnection(peer);
-
-      peer.ondatachannel = (e) => {
-        const dataChannel = e.channel;
-        setDataChannel(dataChannel);
-
-        dataChannel.onclose = () => {
-          peer.close();
-          setConnectionState('closed');
-        };
+      peer.onicecandidate = (e) => {
+        if (e.candidate === null) {
+          setSDP(peer.localDescription?.sdp);
+        }
       };
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+
+      peer.onconnectionstatechange = () => {
+        console.log(peer.connectionState);
+        setConnectionState(peer.connectionState);
+        if (peer.connectionState === 'disconnected') {
+          peer.close();
+        }
+      };
+
+      const offerDescription = new RTCSessionDescription({
+        type: 'offer',
+        sdp: offerSDP,
+      });
+
+      try {
+        await peer.setRemoteDescription(offerDescription);
+        const sessionDescription = await peer.createAnswer();
+        await peer.setLocalDescription(sessionDescription);
+        setPeerConnection(peer);
+
+        peer.ondatachannel = (e) => {
+          const dataChannel = e.channel;
+          setDataChannel(dataChannel);
+
+          dataChannel.onclose = () => {
+            peer.close();
+            setConnectionState('closed');
+          };
+        };
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [config]
+  );
 
   return {
     peer: peerConnection,

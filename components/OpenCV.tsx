@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
-import { Landmark } from '../context/Landmark';
-import { HeadPose } from '../context/HeadPose';
+import { Landmark } from '@/context/Landmark';
+import { HeadPose } from '@/context/HeadPose';
 
 export const OpenCV = () => {
   const [points] = Landmark.Points.useContainer();
@@ -266,7 +266,7 @@ export const OpenCV = () => {
     tvec.delete();
 
     return () => {};
-  }, [points]);
+  }, [points, setEulerAngles, setRotation, setTranslation]);
 
   return (
     <Head>

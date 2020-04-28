@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect';
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader';
 import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHelper';
-import { HeadPose } from '../context/HeadPose';
-import { Landmark } from '../context/Landmark';
-import { KalmanFilter } from '../libs/KalmanFilter';
+import { HeadPose } from '@/context/HeadPose';
+import { Landmark } from '@/context/Landmark';
+import { KalmanFilter } from '@/libs/KalmanFilter';
 
 const CANVAS_SIZE = [640, 480] as const;
 
@@ -81,7 +81,7 @@ function render() {
   effect.render(scene, camera);
 }
 
-export default () => {
+export const MMD = () => {
   const divRef = React.useRef<HTMLDivElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
@@ -180,19 +180,19 @@ export default () => {
       <p>
         {eulerAngles && (
           <>
-            <span style={{ color: 'green' }}>　yaw: </span>
+            <span style={{ color: 'green' }}>{'　yaw: '}</span>
             {Math.round(eulerAngles.yaw)}
           </>
         )}
         {eulerAngles && (
           <>
-            <span style={{ color: 'blue' }}>　pitch: </span>
+            <span style={{ color: 'blue' }}>{'　pitch: '}</span>
             {Math.round(eulerAngles.pitch)}
           </>
         )}
         {eulerAngles && (
           <>
-            <span style={{ color: 'red' }}>　roll: </span>
+            <span style={{ color: 'red' }}>{'　roll: '}</span>
             {Math.round(eulerAngles.roll)}
           </>
         )}
@@ -202,3 +202,5 @@ export default () => {
     </div>
   );
 };
+
+export default MMD;

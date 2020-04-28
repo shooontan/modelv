@@ -1,7 +1,7 @@
 import React from 'react';
-import { HeadPose } from '../../context/HeadPose';
-import { aikotoba } from '../../libs/aikotoba';
-import { usePeerConnection } from '../hooks/usePeer';
+import { HeadPose } from '@/context/HeadPose';
+import { aikotoba } from '@/libs/aikotoba';
+import { usePeerConnection } from '@/components/hooks/usePeer';
 
 type DataFormat = {
   eulerAngles: {
@@ -49,7 +49,7 @@ export const OfferPeerConnection = () => {
     peer?.close();
     dataChannel?.close();
     refresh();
-  }, [peer, dataChannel]);
+  }, [peer, dataChannel, refresh]);
 
   /**
    * answer
