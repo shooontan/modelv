@@ -56,7 +56,13 @@ export const AnswerPeerConnection = () => {
   }
 
   return (
-    <div>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+      }}
+    >
       {!peer && (
         <>
           <button

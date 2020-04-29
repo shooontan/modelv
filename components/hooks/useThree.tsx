@@ -24,6 +24,7 @@ export const useMMD = (config: Config) => {
   const [uscene, setUScene] = useState<THREE.Scene>();
   const [ueffect, setUEffect] = useState<OutlineEffect>();
   const [umesh, setUMesh] = useState<THREE.SkinnedMesh>();
+  const [urenderer, setURenderer] = useState<THREE.WebGLRenderer>();
 
   useEffect(
     () => {
@@ -53,6 +54,7 @@ export const useMMD = (config: Config) => {
       });
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setClearColor(0xcccccc, 0);
+      setURenderer(renderer);
 
       // effect
       const effect = new OutlineEffect(renderer, {});
@@ -100,6 +102,7 @@ export const useMMD = (config: Config) => {
 
   return {
     camera: ucamera,
+    renderer: urenderer,
     helper: uhelper,
     scene: uscene,
     effect: ueffect,

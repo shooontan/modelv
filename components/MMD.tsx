@@ -19,18 +19,46 @@ export const MMD = () => {
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
   const [points] = Landmark.Points.useContainer();
 
-  const { camera, scene, effect, helper, mesh, mmdFileload } = useMMD({
-    canvas: canvasRef,
-    camera: {
-      fov: 40,
-      aspect: CANVAS_SIZE[0] / CANVAS_SIZE[1],
-      near: 1,
-      far: 1000,
-      x: 0,
-      y: 18,
-      z: 10,
-    },
-  });
+  const [size, setSize] = React.useState<[number, number]>([
+    CANVAS_SIZE[0],
+    CANVAS_SIZE[1],
+  ]);
+
+  const { camera, renderer, scene, effect, helper, mesh, mmdFileload } = useMMD(
+    {
+      canvas: canvasRef,
+      camera: {
+        fov: 40,
+        aspect: size[0] / size[1],
+        near: 1,
+        far: 1000,
+        x: 0,
+        y: 18,
+        z: 10,
+      },
+    }
+  );
+
+  React.useEffect(() => {
+    function resize() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      if (renderer) {
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(width, height);
+      }
+      if (camera) {
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      }
+      setSize([width, height]);
+    }
+    resize();
+    addEventListener('resize', resize);
+    return () => {
+      removeEventListener('resize', resize);
+    };
+  }, [renderer, camera]);
 
   React.useEffect(
     () => {
@@ -116,12 +144,13 @@ export const MMD = () => {
 
   return (
     <div>
-      <canvas
-        ref={canvasRef}
-        width={CANVAS_SIZE[0]}
-        height={CANVAS_SIZE[1]}
-      ></canvas>
+      <canvas ref={canvasRef} width={size[0]} height={size[1]}></canvas>
       <input
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+        }}
         type="file"
         multiple
         onChange={(e) => {
