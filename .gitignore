@@ -1,6 +1,8 @@
 node_modules
-public/models
+public/models/*
+!public/models/weights
 .next
 snapweb_js
 opencv
-public/js
+public/js/*
+!public/js/opencv.js
