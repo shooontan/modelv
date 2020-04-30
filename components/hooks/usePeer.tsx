@@ -2,7 +2,9 @@ import React from 'react';
 
 type Configuration = RTCConfiguration;
 
-const defaultConfig = { iceServers: [] };
+const defaultConfig = {
+  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+};
 
 /**
  * WebRTC peer connection custom hook
