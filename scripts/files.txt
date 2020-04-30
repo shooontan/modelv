@@ -1,0 +1,5 @@
+/public/js/opencv.js
+/public/models/weights/tiny_face_detector_model-weights_manifest.json
+/public/models/weights/tiny_face_detector_model-shard1
+/public/models/weights/face_landmark_68_tiny_model-weights_manifest.json
+/public/models/weights/face_landmark_68_tiny_model-shard1
