@@ -172,33 +172,55 @@ export const OpenCV = () => {
           const canvas2 = document.getElementById(
             'canvas2'
           ) as HTMLCanvasElement;
-          canvas2
-            .getContext('2d')
-            ?.clearRect(0, 0, canvas2.width, canvas2.height);
+          const context = canvas2.getContext('2d');
 
-          const img = cv.imread(document.getElementById('canvas2')!);
+          // draw line
+          if (context) {
+            const position = {
+              nose: {
+                x: imagePoints.data64F[0],
+                y: imagePoints.data64F[1],
+              },
+              x: {
+                x: nose_end_point2DX.data64F[0],
+                y: nose_end_point2DX.data64F[1],
+              },
+              y: {
+                x: nose_end_point2DY.data64F[0],
+                y: nose_end_point2DY.data64F[1],
+              },
+              z: {
+                x: nose_end_point2DZ.data64F[0],
+                y: nose_end_point2DZ.data64F[1],
+              },
+            };
 
-          // draw axis
-          const pNose = {
-            x: imagePoints.data64F[0],
-            y: imagePoints.data64F[1],
-          };
-          const pZ = {
-            x: nose_end_point2DZ.data64F[0],
-            y: nose_end_point2DZ.data64F[1],
-          };
-          const p3 = {
-            x: nose_end_point2DY.data64F[0],
-            y: nose_end_point2DY.data64F[1],
-          };
-          const p4 = {
-            x: nose_end_point2DX.data64F[0],
-            y: nose_end_point2DX.data64F[1],
-          };
-          cv.line(img, pNose, pZ, [255, 0, 0, 255], 2);
-          cv.line(img, pNose, p3, [0, 255, 0, 255], 2);
-          cv.line(img, pNose, p4, [0, 0, 255, 255], 2);
-          cv.imshow('canvas2', img);
+            context.clearRect(0, 0, canvas2.width, canvas2.height);
+
+            context.beginPath();
+            context.lineWidth = 2;
+            context.strokeStyle = 'rgb(255, 0, 0)';
+            context.moveTo(position.nose.x, position.nose.y);
+            context.lineTo(position.z.x, position.z.y);
+            context.stroke();
+            context.closePath();
+
+            context.beginPath();
+            context.lineWidth = 2;
+            context.strokeStyle = 'rgb(0, 0, 255)';
+            context.moveTo(position.nose.x, position.nose.y);
+            context.lineTo(position.x.x, position.x.y);
+            context.stroke();
+            context.closePath();
+
+            context.beginPath();
+            context.lineWidth = 2;
+            context.strokeStyle = 'rgb(0, 255, 0)';
+            context.moveTo(position.nose.x, position.nose.y);
+            context.lineTo(position.y.x, position.y.y);
+            context.stroke();
+            context.closePath();
+          }
 
           const rmat = new cv.Mat();
           cv.Rodrigues(rvec, rmat);
@@ -238,7 +260,7 @@ export const OpenCV = () => {
             roll: eulerAngles.data64F[2],
           });
 
-          img.delete();
+          // img.delete();
           pointZ.delete();
           pointY.delete();
           pointX.delete();
