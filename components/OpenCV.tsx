@@ -290,11 +290,18 @@ export const OpenCV = () => {
     return () => {};
   }, [points, setEulerAngles, setRotation, setTranslation]);
 
+  const loadedOpenCV = typeof window !== 'undefined' && window.cv;
+
   return (
     <>
-      <Head>
-        <script src="/js/opencv.js" type="text/javascript"></script>
-      </Head>
+      {
+        // load once.
+        !loadedOpenCV && (
+          <Head>
+            <script src="/js/opencv.js" type="text/javascript"></script>
+          </Head>
+        )
+      }
       <p>
         {eulerAngles && (
           <>

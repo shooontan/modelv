@@ -3,8 +3,11 @@ import React from 'react';
 import * as faceapi from 'face-api.js';
 import { Landmark } from '@/context/Landmark';
 import { KalmanFilter } from '@/libs/KalmanFilter';
+import { mediaStreamErrorType } from '@/libs/media/error';
 
 const CANVAS_SIZE = [640, 480] as const;
+
+type CameraStatus = 'active' | 'inactive' | 'blocked';
 
 type LandmarkName =
   | 'nose'
@@ -42,42 +45,81 @@ function formatPoint(
   return [x, y];
 }
 
-async function createStream(video: HTMLVideoElement) {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: true,
-  });
-  video.srcObject = stream;
-  await video.play();
-}
-
 export const Camera = () => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  const [cameraActive, setCameraActive] = React.useState<boolean>(false);
+  const [cameraStatus, setCameraStatus] = React.useState<CameraStatus>(
+    'inactive'
+  );
+  const [isLoadedModel, setIsLoadedModel] = React.useState<boolean>(false);
   const [, setPoints] = Landmark.Points.useContainer();
 
+  /**
+   * load face-api.js models
+   */
   React.useEffect(() => {
-    init();
-    async function init() {
-      await Promise.all([
-        createStream(videoRef.current!),
-        faceapi.nets.tinyFaceDetector.loadFromUri('models/weights'),
-        faceapi.nets.faceLandmark68TinyNet.loadFromUri('models/weights'),
-      ]);
-      setCameraActive(true);
+    let unmount = false;
+
+    loadNets();
+    async function loadNets() {
+      try {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri('models/weights'),
+          faceapi.nets.faceLandmark68TinyNet.loadFromUri('models/weights'),
+        ]);
+
+        // model loading is complate
+        !unmount && setIsLoadedModel(true);
+      } catch (error) {
+        console.log(error);
+      }
     }
+
+    return () => {
+      unmount = true;
+    };
   }, []);
 
+  /**
+   * stop camera stream track
+   */
   React.useEffect(() => {
-    if (!cameraActive) {
+    return () => {
+      /* eslint-disable-next-line react-hooks/exhaustive-deps */
+      const video = videoRef.current;
+      const stream = video?.srcObject;
+      if (stream instanceof MediaStream) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      } else {
+        /**
+         * TODO: fix
+         * When user go back page soon, can not stop track because stream is not started and 'null'.
+         * To deal with this problem, use settimeout.
+         */
+        setTimeout(() => {
+          const stream = video?.srcObject;
+          if (stream instanceof MediaStream) {
+            stream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+        }, 1000);
+      }
+    };
+  }, []);
+
+  /**
+   * face detect
+   */
+  React.useEffect(() => {
+    if (cameraStatus !== 'active' || !isLoadedModel) {
       return;
     }
 
-    if (faceapi.nets.tinyFaceDetector.isLoaded) {
-      createStream(videoRef.current!);
-    }
+    let unmount = false;
 
     detect();
     async function detect() {
@@ -87,9 +129,9 @@ export const Camera = () => {
         return console.log('video or canvas is null');
       }
 
-      cameraActive && requestAnimationFrame(detect);
+      !unmount && cameraStatus === 'active' && requestAnimationFrame(detect);
 
-      // ウェブカメラの映像から顔データを取得
+      //  get facedata from webcam
       const useTinyModel = true;
       const detection = await faceapi
         .detectSingleFace(
@@ -104,17 +146,17 @@ export const Camera = () => {
         return;
       }
 
-      // 顔データをリサイズ
+      // resize facedata
       const resizedDetection = faceapi.resizeResults(detection, {
         width: video.width,
         height: video.height,
       });
 
-      // キャンバスに描画
+      // draw canvas landmarks point
       canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
       faceapi.draw.drawFaceLandmarks(canvas, resizedDetection);
 
-      // 座標を更新
+      // update points
       const landmarks = resizedDetection.landmarks;
       const nose = landmarks.getNose()[3];
       const leftEye = landmarks.getLeftEye()[0];
@@ -127,37 +169,66 @@ export const Camera = () => {
       const leftOutline = landmarks.getJawOutline()[0];
       const rightOutline = landmarks.getJawOutline()[16];
 
-      setPoints({
-        nose: formatPoint('nose', nose),
-        leftEye: formatPoint('leftEye', leftEye),
-        rightEye: formatPoint('rightEye', rightEye),
-        jaw: formatPoint('jaw', jaw),
-        leftMouth: formatPoint('leftMouth', leftMouth),
-        rightMouth: formatPoint('rightMouth', rightMouth),
-        upperLip: formatPoint('upperLip', upperLip),
-        lowerLip: formatPoint('lowerLip', lowerLip),
-        leftOutline: formatPoint('leftOutline', leftOutline),
-        rightOutline: formatPoint('rightOutline', rightOutline),
-      });
+      !unmount &&
+        setPoints({
+          nose: formatPoint('nose', nose),
+          leftEye: formatPoint('leftEye', leftEye),
+          rightEye: formatPoint('rightEye', rightEye),
+          jaw: formatPoint('jaw', jaw),
+          leftMouth: formatPoint('leftMouth', leftMouth),
+          rightMouth: formatPoint('rightMouth', rightMouth),
+          upperLip: formatPoint('upperLip', upperLip),
+          lowerLip: formatPoint('lowerLip', lowerLip),
+          leftOutline: formatPoint('leftOutline', leftOutline),
+          rightOutline: formatPoint('rightOutline', rightOutline),
+        });
     }
-  }, [cameraActive, setPoints]);
+
+    return () => {
+      unmount = true;
+    };
+  }, [cameraStatus, isLoadedModel, setPoints]);
+
+  /**
+   * handle click camera button
+   */
+  const onClickCamera = React.useCallback(async () => {
+    if (cameraStatus === 'active') {
+      const stream = videoRef.current?.srcObject;
+      if (stream instanceof MediaStream) {
+        stream.getTracks().forEach((s) => {
+          s.stop();
+        });
+        setCameraStatus('inactive');
+      }
+    }
+    if (cameraStatus === 'inactive') {
+      const video = videoRef.current;
+      if (video) {
+        try {
+          // await createStream(video);
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: true,
+          });
+          video.srcObject = stream;
+          await video.play();
+          setCameraStatus('active');
+        } catch (error) {
+          console.log(error);
+          const errorType = mediaStreamErrorType(error);
+          console.log(errorType);
+        }
+      }
+    }
+  }, [cameraStatus]);
 
   return (
     <>
-      <button
-        onClick={() => {
-          if (cameraActive) {
-            const stream = videoRef.current?.srcObject;
-            if (stream instanceof MediaStream) {
-              stream.getTracks().forEach((s) => {
-                s.stop();
-              });
-            }
-          }
-          setCameraActive(!cameraActive);
-        }}
-      >
-        {cameraActive ? 'stop' : 'start'}
+      <button disabled={cameraStatus === 'blocked'} onClick={onClickCamera}>
+        {cameraStatus === 'active' && 'stop'}
+        {cameraStatus === 'inactive' && 'start'}
+        {cameraStatus === 'blocked' && 'start'}
       </button>
       <div
         style={{

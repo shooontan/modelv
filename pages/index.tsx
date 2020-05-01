@@ -1,20 +1,22 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
-import { Camera } from '@/components/Camera';
-import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnection';
-
-const DynamicOpenCV = dynamic(() => import('@/components/OpenCV'), {
-  ssr: false,
-});
+import Link from 'next/link';
 
 function Home() {
   return (
     <>
-      <DynamicOpenCV />
+      <p>Model V</p>
       <div>
-        <Camera />
+        <p>
+          <Link href="/cpanel">
+            <a>操作パネル</a>
+          </Link>
+        </p>
+        <p>
+          <Link href="/model">
+            <a>モデル</a>
+          </Link>
+        </p>
       </div>
-      <OfferPeerConnection />
     </>
   );
 }
