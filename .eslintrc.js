@@ -18,6 +18,7 @@ module.exports = {
     node: true,
     browser: true,
     es6: true,
+    jest: true,
   },
   globals: {},
   settings: {
