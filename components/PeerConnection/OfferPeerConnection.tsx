@@ -2,6 +2,7 @@ import React from 'react';
 import { HeadPose } from '@/context/HeadPose';
 import { aikotoba } from '@/libs/aikotoba';
 import { usePeerConnection } from '@/components/hooks/usePeer';
+import { Button } from '@/components/atoms/Button';
 
 type DataFormat = {
   eulerAngles: {
@@ -11,8 +12,13 @@ type DataFormat = {
   };
 };
 
+type ConnectionStep = 'idle' | 'offered' | 'connectiong' | 'error';
+
 export const OfferPeerConnection = () => {
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
+  const [connectionStep, setConnectionStep] = React.useState<ConnectionStep>(
+    'idle'
+  );
 
   // for connection
   const [answerSDP, setAnswerSDP] = React.useState('');
@@ -22,7 +28,7 @@ export const OfferPeerConnection = () => {
     createOffer,
     sdp,
     connectionState,
-    refresh,
+    // refresh,
   } = usePeerConnection();
 
   /**
@@ -43,15 +49,6 @@ export const OfferPeerConnection = () => {
   }, [dataChannel, eulerAngles]);
 
   /**
-   * reconnect
-   */
-  const handleReconnect = React.useCallback(async () => {
-    peer?.close();
-    dataChannel?.close();
-    refresh();
-  }, [peer, dataChannel, refresh]);
-
-  /**
    * answer
    */
   const handleAnser = React.useCallback(async () => {
@@ -61,44 +58,114 @@ export const OfferPeerConnection = () => {
     });
     try {
       await peer?.setRemoteDescription(answerDescription);
+      setConnectionStep('connectiong');
     } catch (error) {
+      setConnectionStep('error');
       console.log(error);
     }
   }, [peer, answerSDP]);
 
-  const showReconnectBtn =
-    // 接続中
-    (peer && dataChannel?.readyState !== 'open') ||
-    // 切断
-    dataChannel?.readyState === 'closed';
+  /**
+   * display value
+   */
+  let displayStatus = '';
+  switch (connectionStep) {
+    case 'idle': {
+      displayStatus = '未接続';
+      break;
+    }
+    case 'offered': {
+      displayStatus = '接続待ち';
+      break;
+    }
+    case 'connectiong': {
+      displayStatus = '接続中';
+      break;
+    }
+    case 'error': {
+      displayStatus = 'エラー発生';
+      break;
+    }
+  }
 
   return (
-    <div>
-      {showReconnectBtn && (
-        <div>
-          <button onClick={handleReconnect}>再接続する</button>
-        </div>
-      )}
+    <>
+      <p>status: {displayStatus}</p>
+      {
+        // generate buttton
+        !peer && connectionState !== 'disconnected' && (
+          <Button
+            onClick={async () => {
+              try {
+                await createOffer();
+                setConnectionStep('offered');
+              } catch (error) {
+                setConnectionStep('error');
+                console.log(error);
+              }
+            }}
+          >
+            コネクトキーを生成する
+          </Button>
+        )
+      }
 
-      {!peer && connectionState !== 'disconnected' && (
-        <button onClick={createOffer}>コネクトキーを生成する</button>
-      )}
-
-      {dataChannel &&
-        dataChannel.readyState !== 'open' &&
-        connectionState !== 'disconnected' && (
+      {
+        // connect key
+        peer && sdp && connectionStep === 'offered' && (
           <>
-            <p>コネクトキー</p>
-            <p>{aikotoba.encode(sdp || '')}</p>
-            <button onClick={handleAnser} disabled={!answerSDP}>
-              リターンキーを入力する
-            </button>
-            <textarea
-              value={answerSDP}
-              onChange={(e) => setAnswerSDP(e.target.value)}
-            />
+            <div className="keyframe">
+              <p className="keyname">コネクトキー</p>
+              <p className="key">{aikotoba.encode(sdp || '')}</p>
+            </div>
           </>
-        )}
-    </div>
+        )
+      }
+
+      {
+        // return key
+        peer && sdp && connectionStep === 'offered' && (
+          <>
+            <div className="keyframe">
+              <p className="keyname">リターンキー</p>
+
+              <textarea
+                rows={6}
+                value={answerSDP}
+                onChange={(e) => setAnswerSDP(e.target.value)}
+              />
+              <Button onClick={handleAnser} disabled={!answerSDP}>
+                入力する
+              </Button>
+            </div>
+          </>
+        )
+      }
+
+      <style jsx>{`
+        .keyframe {
+          margin: 1em 0;
+          padding: 1em;
+          width: 100%;
+          max-width: 600px;
+          border: 1px solid #bbb;
+          border-radius: 6px;
+          word-break: break-all;
+        }
+
+        .keyname {
+          margin: 0 0 1em;
+          padding: 0;
+        }
+
+        .key {
+          margin: 0;
+        }
+
+        textarea {
+          width: 100%;
+        }
+      `}</style>
+    </>
   );
 };

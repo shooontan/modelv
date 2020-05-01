@@ -21,6 +21,7 @@
     "next-transpile-modules": "^3.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "styled-jsx": "^3.2.5",
     "three": "^0.115.0",
     "unstated-next": "^1.1.0"
   },
@@ -38,7 +39,9 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^3.0.0",
     "jest": "^25.5.3",
+    "node-sass": "^4.14.0",
     "prettier": "^2.0.5",
+    "styled-jsx-plugin-sass": "^1.0.0",
     "ts-jest": "^25.4.0",
     "typescript": "^3.8.3"
   }

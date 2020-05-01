@@ -266,6 +266,12 @@ export const Camera = () => {
           }}
         ></canvas>
       </div>
+
+      <style jsx>{`
+        video {
+          background: #000;
+        }
+      `}</style>
     </>
   );
 };
