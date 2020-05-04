@@ -239,6 +239,9 @@ export const Camera = () => {
           ref={videoRef}
           width={CANVAS_SIZE[0]}
           height={CANVAS_SIZE[1]}
+          autoPlay
+          muted
+          playsInline
           style={{
             transform: 'scaleX(-1)',
           }}
