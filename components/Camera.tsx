@@ -4,6 +4,7 @@ import * as faceapi from 'face-api.js';
 import { Landmark } from '@/context/Landmark';
 import { KalmanFilter } from '@/libs/KalmanFilter';
 import { mediaStreamErrorType } from '@/libs/media/error';
+import { Button } from '@/components/atoms/Button';
 
 type Size = [number, number];
 const DEFAULT_CANVAS_SIZE: Size = [640, 480];
@@ -250,32 +251,42 @@ export const Camera = () => {
 
   return (
     <>
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: 640,
-          height: 480,
-          margin: 0,
-        }}
-      >
-        <video ref={videoRef} autoPlay muted playsInline />
-        <canvas
-          ref={canvasRef}
-          width={videoDomSize[0]}
-          height={videoDomSize[1]}
-        />
-        <canvas id="canvas2" width={videoDomSize[0]} height={videoDomSize[1]} />
+      <div className="videoframe">
+        <div className="inner">
+          <video ref={videoRef} autoPlay muted playsInline />
+          <canvas
+            ref={canvasRef}
+            width={videoDomSize[0]}
+            height={videoDomSize[1]}
+          />
+          <canvas
+            id="canvas2"
+            width={videoDomSize[0]}
+            height={videoDomSize[1]}
+          />
+        </div>
       </div>
 
-      <button disabled={cameraStatus === 'blocked'} onClick={onClickCamera}>
-        {cameraStatus === 'active' && 'stop'}
-        {cameraStatus === 'inactive' && 'start'}
-        {cameraStatus === 'blocked' && 'start'}
-      </button>
+      <div className="cbutton">
+        <Button disabled={cameraStatus === 'blocked'} onClick={onClickCamera}>
+          {cameraStatus === 'active' && 'ストップ'}
+          {cameraStatus === 'inactive' && 'スタート'}
+          {cameraStatus === 'blocked' && 'スタート'}
+        </Button>
+      </div>
 
       <style jsx>{`
-        div {
+        .videoframe {
+          background: #111;
+        }
+
+        .videoframe .inner {
+          display: flex;
+          position: relative;
+          margin: 0 auto;
+          width: 100%;
+          max-width: 640px;
+          height: 480px;
           background: #000;
         }
 
@@ -299,6 +310,12 @@ export const Camera = () => {
           left: 0;
           margin: auto;
           transform: scaleX(-1);
+        }
+
+        .cbutton {
+          padding: 20px 0;
+          width: 100%;
+          text-align: center;
         }
       `}</style>
     </>
