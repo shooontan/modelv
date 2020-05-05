@@ -1,21 +1,15 @@
 import React from 'react';
-import { HeadPose } from '@/context/HeadPose';
+import { HeadPose, Landmark } from '@/context';
 import { aikotoba } from '@/libs/aikotoba';
 import { usePeerConnection } from '@/components/hooks/usePeer';
 import { Button } from '@/components/atoms/Button';
-
-type DataFormat = {
-  eulerAngles: {
-    pitch: number;
-    roll: number;
-    yaw: number;
-  };
-};
+import { DataFormat } from './types';
 
 type ConnectionStep = 'idle' | 'offered' | 'connectiong' | 'error';
 
 export const OfferPeerConnection = () => {
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
+  const [points] = Landmark.Points.useContainer();
   const [connectionStep, setConnectionStep] = React.useState<ConnectionStep>(
     'idle'
   );
@@ -38,6 +32,7 @@ export const OfferPeerConnection = () => {
     if (eulerAngles && dataChannel && dataChannel.readyState === 'open') {
       const data: DataFormat = {
         eulerAngles: eulerAngles,
+        points,
       };
 
       try {
@@ -46,7 +41,7 @@ export const OfferPeerConnection = () => {
         console.log(error);
       }
     }
-  }, [dataChannel, eulerAngles]);
+  }, [dataChannel, eulerAngles, points]);
 
   /**
    * answer

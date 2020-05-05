@@ -1,19 +1,13 @@
 import React from 'react';
-import { HeadPose } from '@/context/HeadPose';
+import { HeadPose, Landmark } from '@/context';
 import { aikotoba } from '@/libs/aikotoba';
 import { usePeerConnection } from '@/components/hooks/usePeer';
 import { Button } from '@/components/atoms/Button';
-
-type DataFormat = {
-  eulerAngles: {
-    pitch: number;
-    roll: number;
-    yaw: number;
-  };
-};
+import { DataFormat } from './types';
 
 export const AnswerPeerConnection = () => {
   const [, setEulerAngles] = HeadPose.EulerAngles.useContainer();
+  const [, setPoints] = Landmark.Points.useContainer();
 
   // for connection
   const [offerSDP, setOfferSDP] = React.useState('');
@@ -36,8 +30,9 @@ export const AnswerPeerConnection = () => {
     dataChannel.onmessage = (e) => {
       const data = JSON.parse(e.data) as DataFormat;
       setEulerAngles(data.eulerAngles);
+      setPoints(data.points);
     };
-  }, [dataChannel, setEulerAngles]);
+  }, [dataChannel, setEulerAngles, setPoints]);
 
   /**
    * refresh connection

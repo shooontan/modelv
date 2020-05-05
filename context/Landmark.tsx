@@ -3,7 +3,7 @@ import { createContainer } from 'unstated-next';
 
 type Point = [number, number];
 
-type Points = {
+export type Points = {
   nose?: Point;
   leftEye?: Point;
   rightEye?: Point;
