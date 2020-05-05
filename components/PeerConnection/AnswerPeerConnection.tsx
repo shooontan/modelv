@@ -92,7 +92,11 @@ export const AnswerPeerConnection = () => {
             <>
               <div className="keyframe">
                 <p className="keyname">リターンキー</p>
-                <p className="key">{aikotoba.encode(sdp || '')}</p>
+                <textarea
+                  rows={6}
+                  value={aikotoba.encode(sdp || '')}
+                  readOnly
+                />
               </div>
             </>
           )
@@ -110,7 +114,8 @@ export const AnswerPeerConnection = () => {
           margin: 1em 0;
           padding: 1em;
           width: 100%;
-          max-width: 600px;
+          max-width: 400px;
+          background: rgba(255, 255, 255, 0.9);
           border: 1px solid #bbb;
           border-radius: 6px;
           word-break: break-all;
@@ -119,10 +124,6 @@ export const AnswerPeerConnection = () => {
         .keyname {
           margin: 0 0 1em;
           padding: 0;
-        }
-
-        .key {
-          margin: 0;
         }
 
         textarea {

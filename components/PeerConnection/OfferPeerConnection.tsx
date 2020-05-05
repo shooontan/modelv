@@ -116,7 +116,7 @@ export const OfferPeerConnection = () => {
           <>
             <div className="keyframe">
               <p className="keyname">コネクトキー</p>
-              <p className="key">{aikotoba.encode(sdp || '')}</p>
+              <textarea rows={6} value={aikotoba.encode(sdp || '')} readOnly />
             </div>
           </>
         )
@@ -156,10 +156,6 @@ export const OfferPeerConnection = () => {
         .keyname {
           margin: 0 0 1em;
           padding: 0;
-        }
-
-        .key {
-          margin: 0;
         }
 
         textarea {
