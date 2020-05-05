@@ -5,7 +5,8 @@ import { Landmark } from '@/context/Landmark';
 import { KalmanFilter } from '@/libs/KalmanFilter';
 import { mediaStreamErrorType } from '@/libs/media/error';
 
-const CANVAS_SIZE = [640, 480] as const;
+type Size = [number, number];
+const DEFAULT_CANVAS_SIZE: Size = [640, 480];
 
 type CameraStatus = 'active' | 'inactive' | 'blocked';
 
@@ -54,6 +55,9 @@ export const Camera = () => {
   );
   const [isLoadedModel, setIsLoadedModel] = React.useState<boolean>(false);
   const [, setPoints] = Landmark.Points.useContainer();
+  const [videoStreamSize, setVideoStreamSize] = React.useState<Size>(
+    DEFAULT_CANVAS_SIZE
+  );
 
   /**
    * load face-api.js models
@@ -131,6 +135,21 @@ export const Camera = () => {
 
       !unmount && cameraStatus === 'active' && requestAnimationFrame(detect);
 
+      const trackSettings = (video.srcObject as MediaStream)
+        .getTracks()[0]
+        .getSettings();
+      const { width, height } = trackSettings;
+
+      const isNum = (value: any): value is number => typeof value === 'number';
+      const videoWidth = isNum(width) ? width : videoStreamSize[0];
+      const videoHeight = isNum(height) ? height : videoStreamSize[1];
+      if (
+        videoWidth !== videoStreamSize[0] ||
+        videoHeight !== videoStreamSize[1]
+      ) {
+        setVideoStreamSize([videoWidth, videoHeight]);
+      }
+
       //  get facedata from webcam
       const useTinyModel = true;
       const detection = await faceapi
@@ -148,8 +167,8 @@ export const Camera = () => {
 
       // resize facedata
       const resizedDetection = faceapi.resizeResults(detection, {
-        width: video.width,
-        height: video.height,
+        width: canvas.width,
+        height: canvas.height,
       });
 
       // draw canvas landmarks point
@@ -187,7 +206,7 @@ export const Camera = () => {
     return () => {
       unmount = true;
     };
-  }, [cameraStatus, isLoadedModel, setPoints]);
+  }, [cameraStatus, isLoadedModel, videoStreamSize, setPoints]);
 
   /**
    * handle click camera button
@@ -223,56 +242,63 @@ export const Camera = () => {
     }
   }, [cameraStatus]);
 
+  const isLandscapeVideoStream = videoStreamSize[0] >= videoStreamSize[1];
+
+  const videoDomSize: Size = videoRef.current
+    ? [videoRef.current.clientWidth, videoRef.current.clientHeight]
+    : DEFAULT_CANVAS_SIZE;
+
   return (
     <>
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: 640,
+          height: 480,
+          margin: 0,
+        }}
+      >
+        <video ref={videoRef} autoPlay muted playsInline />
+        <canvas
+          ref={canvasRef}
+          width={videoDomSize[0]}
+          height={videoDomSize[1]}
+        />
+        <canvas id="canvas2" width={videoDomSize[0]} height={videoDomSize[1]} />
+      </div>
+
       <button disabled={cameraStatus === 'blocked'} onClick={onClickCamera}>
         {cameraStatus === 'active' && 'stop'}
         {cameraStatus === 'inactive' && 'start'}
         {cameraStatus === 'blocked' && 'start'}
       </button>
-      <div
-        style={{
-          position: 'relative',
-        }}
-      >
-        <video
-          ref={videoRef}
-          width={CANVAS_SIZE[0]}
-          height={CANVAS_SIZE[1]}
-          autoPlay
-          muted
-          playsInline
-          style={{
-            transform: 'scaleX(-1)',
-          }}
-        ></video>
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_SIZE[0]}
-          height={CANVAS_SIZE[1]}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            transform: 'scaleX(-1)',
-          }}
-        ></canvas>
-        <canvas
-          id="canvas2"
-          width={CANVAS_SIZE[0]}
-          height={CANVAS_SIZE[1]}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            transform: 'scaleX(-1)',
-          }}
-        ></canvas>
-      </div>
 
       <style jsx>{`
-        video {
+        div {
           background: #000;
+        }
+
+        video {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          margin: auto;
+          width: 100%;
+          height: ${isLandscapeVideoStream ? 'auto' : '100%'};
+          transform: scaleX(-1);
+        }
+
+        canvas {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          margin: auto;
+          transform: scaleX(-1);
         }
       `}</style>
     </>
