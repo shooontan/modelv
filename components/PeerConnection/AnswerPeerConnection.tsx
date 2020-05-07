@@ -47,6 +47,19 @@ export const AnswerPeerConnection = () => {
     }
   }, [dataChannel, connectionState, refresh]);
 
+  /**
+   * copy sdp
+   */
+  const handleSDPCopy = React.useCallback(() => {
+    const listner = (e: ClipboardEvent) => {
+      e.clipboardData?.setData('text/plain', aikotoba.encode(sdp || ''));
+      e.preventDefault();
+    };
+    document.addEventListener('copy', listner);
+    document.execCommand('copy');
+    document.removeEventListener('copy', listner);
+  }, [sdp]);
+
   if (dataChannel?.readyState === 'open') {
     return null;
   }
@@ -92,6 +105,7 @@ export const AnswerPeerConnection = () => {
                   value={aikotoba.encode(sdp || '')}
                   readOnly
                 />
+                <Button onClick={handleSDPCopy}>コピーする</Button>
               </div>
             </>
           )

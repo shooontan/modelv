@@ -61,6 +61,19 @@ export const OfferPeerConnection = () => {
   }, [peer, answerSDP]);
 
   /**
+   * copy sdp
+   */
+  const handleSDPCopy = React.useCallback(() => {
+    const listner = (e: ClipboardEvent) => {
+      e.clipboardData?.setData('text/plain', aikotoba.encode(sdp || ''));
+      e.preventDefault();
+    };
+    document.addEventListener('copy', listner);
+    document.execCommand('copy');
+    document.removeEventListener('copy', listner);
+  }, [sdp]);
+
+  /**
    * display value
    */
   let displayStatus = '';
@@ -112,6 +125,7 @@ export const OfferPeerConnection = () => {
             <div className="keyframe">
               <p className="keyname">コネクトキー</p>
               <textarea rows={6} value={aikotoba.encode(sdp || '')} readOnly />
+              <Button onClick={handleSDPCopy}>コピーする</Button>
             </div>
           </>
         )
