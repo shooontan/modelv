@@ -98,7 +98,7 @@ export const OfferPeerConnection = () => {
 
   return (
     <>
-      <p>status: {displayStatus}</p>
+      <p className="status">ステータス: {displayStatus}</p>
       {
         // generate buttton
         !peer && connectionState !== 'disconnected' && (
@@ -153,22 +153,29 @@ export const OfferPeerConnection = () => {
 
       <style jsx>{`
         .keyframe {
-          margin: 1em 0;
-          padding: 1em;
+          margin: 0 0 4em 0;
           width: 100%;
-          max-width: 600px;
-          border: 1px solid #bbb;
-          border-radius: 6px;
+          box-sizing: border-box;
           word-break: break-all;
         }
 
+        .keyframe:last-child {
+          margin: 0;
+        }
+
         .keyname {
-          margin: 0 0 1em;
+          margin: 0 0 0.5em;
           padding: 0;
         }
 
         textarea {
           width: 100%;
+          resize: vertical;
+          margin: 0 0 0.5em;
+          padding: 1em 0.5em 1em 1em;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-sizing: border-box;
         }
       `}</style>
     </>

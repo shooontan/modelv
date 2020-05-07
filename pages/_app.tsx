@@ -39,6 +39,11 @@ const App: NextComponentType<AppContextType, AppProps, AppPropsType> = ({
       >
         <Component {...pageProps} />
       </Providers>
+      <style jsx global>{`
+        body {
+          overflow-y: scroll;
+        }
+      `}</style>
     </>
   );
 };

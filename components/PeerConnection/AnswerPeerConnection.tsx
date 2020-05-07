@@ -137,6 +137,7 @@ export const AnswerPeerConnection = () => {
 
         textarea {
           width: 100%;
+          resize: vertical;
         }
       `}</style>
     </>

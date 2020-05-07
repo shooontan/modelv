@@ -19,6 +19,10 @@ function Home() {
           height: 100%;
           overflow: hidden;
         }
+
+        body {
+          overflow-y: hidden !important;
+        }
       `}</style>
     </>
   );

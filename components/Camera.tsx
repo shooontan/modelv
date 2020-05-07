@@ -269,14 +269,15 @@ export const Camera = () => {
 
       <div className="cbutton">
         <Button disabled={cameraStatus === 'blocked'} onClick={onClickCamera}>
-          {cameraStatus === 'active' && 'ストップ'}
-          {cameraStatus === 'inactive' && 'スタート'}
-          {cameraStatus === 'blocked' && 'スタート'}
+          {cameraStatus === 'active' && 'カメラ停止'}
+          {cameraStatus === 'inactive' && 'カメラ起動'}
+          {cameraStatus === 'blocked' && 'カメラ起動'}
         </Button>
       </div>
 
       <style jsx>{`
         .videoframe {
+          margin: 0 0 20px;
           background: #111;
         }
 
@@ -313,6 +314,7 @@ export const Camera = () => {
         }
 
         .cbutton {
+          margin: 0 0 20px;
           padding: 20px 0;
           width: 100%;
           text-align: center;

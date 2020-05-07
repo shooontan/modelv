@@ -3,20 +3,28 @@ import dynamic from 'next/dynamic';
 import { Camera } from '@/components/Camera';
 import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnection';
 import { EulerAnglePanel } from '@/components/molecules/EulerAnglePanel';
+import { ControlPanel } from '@/components/molecules/ControlPanel/ControlPanel';
 
 const DynamicOpenCV = dynamic(() => import('@/components/OpenCV'), {
   ssr: false,
 });
 
-function Home() {
+const Home = () => {
+  const items = [
+    {
+      title: '接続',
+      item: <OfferPeerConnection key="connection" />,
+    },
+    {
+      title: 'モデル',
+      item: <EulerAnglePanel key="model" />,
+    },
+  ];
   return (
     <>
       <DynamicOpenCV />
       <Camera />
-      <div>
-        <EulerAnglePanel />
-        <OfferPeerConnection />
-      </div>
+      <ControlPanel lists={items}></ControlPanel>
       <style jsx>{`
         div {
           margin: 0 auto;
@@ -26,6 +34,6 @@ function Home() {
       `}</style>
     </>
   );
-}
+};
 
 export default Home;

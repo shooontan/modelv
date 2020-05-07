@@ -11,10 +11,10 @@ export const Button: React.FC<ButtonProps> = (props) => {
           display: inline-block;
           margin: 0;
           padding: 10px 30px;
-          background: #fff;
-          border: 1px solid #bbb;
+          background: #333;
+          border: 2px solid transparent;
           border-radius: 6px;
-          color: #555;
+          color: #fafafa;
           cursor: pointer;
           font-weight: 600;
           line-height: 1.6;
@@ -23,7 +23,9 @@ export const Button: React.FC<ButtonProps> = (props) => {
         }
 
         button:hover {
-          background: #eee;
+          background: #fafafa;
+          color: #333;
+          border: 2px solid #333;
         }
       `}</style>
     </>
