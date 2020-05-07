@@ -59,6 +59,7 @@ export function usePeerConnection(config: Configuration = defaultConfig) {
     // close event
     dataChannel.onclose = () => {
       peer.close();
+      setConnectionState('closed');
     };
 
     try {

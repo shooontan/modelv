@@ -3,16 +3,12 @@ import { HeadPose, Landmark } from '@/context';
 import { aikotoba } from '@/libs/aikotoba';
 import { usePeerConnection } from '@/components/hooks/usePeer';
 import { Button } from '@/components/atoms/Button';
+import { Icon } from '@/components/atoms/Icon';
 import { DataFormat } from './types';
-
-type ConnectionStep = 'idle' | 'offered' | 'connectiong' | 'error';
 
 export const OfferPeerConnection = () => {
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
   const [points] = Landmark.Points.useContainer();
-  const [connectionStep, setConnectionStep] = React.useState<ConnectionStep>(
-    'idle'
-  );
 
   // for connection
   const [answerSDP, setAnswerSDP] = React.useState('');
@@ -53,9 +49,7 @@ export const OfferPeerConnection = () => {
     });
     try {
       await peer?.setRemoteDescription(answerDescription);
-      setConnectionStep('connectiong');
     } catch (error) {
-      setConnectionStep('error');
       console.log(error);
     }
   }, [peer, answerSDP]);
@@ -77,28 +71,31 @@ export const OfferPeerConnection = () => {
    * display value
    */
   let displayStatus = '';
-  switch (connectionStep) {
-    case 'idle': {
-      displayStatus = '未接続';
-      break;
-    }
-    case 'offered': {
-      displayStatus = '接続待ち';
-      break;
-    }
-    case 'connectiong': {
-      displayStatus = '接続中';
-      break;
-    }
-    case 'error': {
-      displayStatus = 'エラー発生';
-      break;
-    }
+  if (!sdp) {
+    displayStatus = '未接続';
+  } else if (typeof connectionState === 'undefined') {
+    displayStatus = '接続待ち';
+  } else if (connectionState === 'connecting') {
+    displayStatus = '接続待ち';
+  } else if (connectionState === 'connected') {
+    displayStatus = '接続中';
+  } else if (connectionState === 'closed') {
+    displayStatus = '決断済み';
   }
+
+  const showKeyFrame =
+    peer &&
+    sdp &&
+    (connectionState === undefined || connectionState === 'connecting');
 
   return (
     <>
-      <p className="status">ステータス: {displayStatus}</p>
+      <div className="statusframe">
+        <p className="status">
+          ステータス: <Icon.Connection status={connectionState} />
+          {displayStatus}
+        </p>
+      </div>
       {
         // generate buttton
         !peer && connectionState !== 'disconnected' && (
@@ -106,9 +103,7 @@ export const OfferPeerConnection = () => {
             onClick={async () => {
               try {
                 await createOffer();
-                setConnectionStep('offered');
               } catch (error) {
-                setConnectionStep('error');
                 console.log(error);
               }
             }}
@@ -120,7 +115,7 @@ export const OfferPeerConnection = () => {
 
       {
         // connect key
-        peer && sdp && connectionStep === 'offered' && (
+        showKeyFrame && (
           <>
             <div className="keyframe">
               <p className="keyname">コネクトキー</p>
@@ -133,7 +128,7 @@ export const OfferPeerConnection = () => {
 
       {
         // return key
-        peer && sdp && connectionStep === 'offered' && (
+        showKeyFrame && (
           <>
             <div className="keyframe">
               <p className="keyname">リターンキー</p>
@@ -152,6 +147,14 @@ export const OfferPeerConnection = () => {
       }
 
       <style jsx>{`
+        .statusframe {
+          margin: 0 0 1.5em;
+        }
+
+        .status {
+          margin: 0;
+        }
+
         .keyframe {
           margin: 0 0 4em 0;
           width: 100%;

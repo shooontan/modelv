@@ -16,7 +16,7 @@ export const AnswerPeerConnection = () => {
     dataChannel,
     createAnser,
     sdp,
-    refresh,
+    // refresh,
     connectionState,
   } = usePeerConnection();
 
@@ -35,19 +35,6 @@ export const AnswerPeerConnection = () => {
   }, [dataChannel, setEulerAngles, setPoints]);
 
   /**
-   * refresh connection
-   */
-  React.useEffect(() => {
-    if (
-      dataChannel?.readyState === 'closed' ||
-      connectionState === 'closed' ||
-      connectionState === 'disconnected'
-    ) {
-      refresh();
-    }
-  }, [dataChannel, connectionState, refresh]);
-
-  /**
    * copy sdp
    */
   const handleSDPCopy = React.useCallback(() => {
@@ -60,7 +47,7 @@ export const AnswerPeerConnection = () => {
     document.removeEventListener('copy', listner);
   }, [sdp]);
 
-  if (dataChannel?.readyState === 'open') {
+  if (connectionState && connectionState !== 'connecting') {
     return null;
   }
 
