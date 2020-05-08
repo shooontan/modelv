@@ -1,24 +1,16 @@
 import React from 'react';
-import Link from 'next/link';
+import { TopHeader } from '@/components/orgamisms/Header/TopHeader';
+import { HeroHeader } from '@/components/orgamisms/Header/HeroHeader';
+import { TopMain } from '@/components/orgamisms/Main/TopMain';
 
-function Home() {
+const Home: React.FC = () => {
   return (
     <>
-      <p>Model V</p>
-      <div>
-        <p>
-          <Link href="/cpanel">
-            <a>操作パネル</a>
-          </Link>
-        </p>
-        <p>
-          <Link href="/model">
-            <a>モデル</a>
-          </Link>
-        </p>
-      </div>
+      <TopHeader />
+      <HeroHeader />
+      <TopMain />
     </>
   );
-}
+};
 
 export default Home;
