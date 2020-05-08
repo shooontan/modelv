@@ -1,7 +1,6 @@
 import React from 'react';
 import * as THREE from 'three';
-import { HeadPose } from '@/context/HeadPose';
-import { Landmark } from '@/context/Landmark';
+import { HeadPose, Landmark, Model } from '@/context';
 import { KalmanFilter } from '@/libs/KalmanFilter';
 import { useMMD } from '@/components/hooks/useThree';
 import { Input } from '@/components/atoms/Input';
@@ -19,6 +18,7 @@ export const MMD = () => {
 
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
   const [points] = Landmark.Points.useContainer();
+  const [bgColor] = Model.BackgroundColor.useContainer();
 
   const [size, setSize] = React.useState<[number, number]>([
     CANVAS_SIZE[0],
@@ -136,6 +136,19 @@ export const MMD = () => {
     },
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
     [eulerAngles, points]
+  );
+
+  /**
+   * update background color
+   */
+  React.useEffect(
+    () => {
+      if (scene) {
+        scene.background = new THREE.Color(bgColor);
+      }
+    },
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    [bgColor]
   );
 
   const animation = React.useCallback(() => {

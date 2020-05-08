@@ -1,5 +1,5 @@
 import React from 'react';
-import { HeadPose, Landmark } from '@/context';
+import { HeadPose, Landmark, Model } from '@/context';
 import { aikotoba } from '@/libs/aikotoba';
 import { usePeerConnection } from '@/components/hooks/usePeer';
 import { Button } from '@/components/atoms/Button';
@@ -9,6 +9,7 @@ import { DataFormat } from './types';
 export const OfferPeerConnection = () => {
   const [eulerAngles] = HeadPose.EulerAngles.useContainer();
   const [points] = Landmark.Points.useContainer();
+  const [bgColor] = Model.BackgroundColor.useContainer();
 
   // for connection
   const [answerSDP, setAnswerSDP] = React.useState('');
@@ -25,19 +26,21 @@ export const OfferPeerConnection = () => {
    * send data
    */
   React.useEffect(() => {
-    if (eulerAngles && dataChannel && dataChannel.readyState === 'open') {
-      const data: DataFormat = {
-        eulerAngles: eulerAngles,
-        points,
-      };
-
-      try {
-        dataChannel.send(JSON.stringify(data));
-      } catch (error) {
-        console.log(error);
-      }
+    if (dataChannel?.readyState !== 'open') {
+      return;
     }
-  }, [dataChannel, eulerAngles, points]);
+
+    const data: DataFormat = {
+      eulerAngles,
+      points,
+      backgroundColor: bgColor,
+    };
+    try {
+      dataChannel.send(JSON.stringify(data));
+    } catch (error) {
+      console.log(error);
+    }
+  }, [dataChannel, eulerAngles, points, bgColor]);
 
   /**
    * answer
@@ -80,7 +83,7 @@ export const OfferPeerConnection = () => {
   } else if (connectionState === 'connected') {
     displayStatus = '接続中';
   } else if (connectionState === 'closed') {
-    displayStatus = '決断済み';
+    displayStatus = '切断済み';
   }
 
   const showKeyFrame =

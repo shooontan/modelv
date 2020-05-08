@@ -2,8 +2,9 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { Camera } from '@/components/Camera';
 import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnection';
-import { EulerAnglePanel } from '@/components/molecules/EulerAnglePanel';
+// import { EulerAnglePanel } from '@/components/molecules/EulerAnglePanel';
 import { ControlPanel } from '@/components/molecules/ControlPanel/ControlPanel';
+import { BackgroundColorPanel } from '@/components/molecules/BackgroundColorPanel/BackgroundColorPanel';
 
 const DynamicOpenCV = dynamic(() => import('@/components/OpenCV'), {
   ssr: false,
@@ -17,7 +18,12 @@ const Home = () => {
     },
     {
       title: 'モデル',
-      item: <EulerAnglePanel key="model" />,
+      item: (
+        <>
+          {/* <EulerAnglePanel key="model" /> */}
+          <BackgroundColorPanel />
+        </>
+      ),
     },
   ];
   return (

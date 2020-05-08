@@ -5,7 +5,7 @@ import {
   AppContextType,
   NextComponentType,
 } from 'next/dist/next-server/lib/utils';
-import { Providers, HeadPose, Landmark } from '@/context';
+import { Providers, HeadPose, Landmark, Model } from '@/context';
 
 type AppProps = {};
 
@@ -35,6 +35,9 @@ const App: NextComponentType<AppContextType, AppProps, AppPropsType> = ({
           <HeadPose.EulerAngles.Provider key="eulerangles">
             {}
           </HeadPose.EulerAngles.Provider>,
+          <Model.BackgroundColor.Provider key="backgroundcolor">
+            {}
+          </Model.BackgroundColor.Provider>,
         ]}
       >
         <Component {...pageProps} />

@@ -1,10 +1,11 @@
 import { Points } from '@/context/Landmark';
 
 export type DataFormat = {
-  eulerAngles: {
+  eulerAngles?: {
     pitch: number;
     roll: number;
     yaw: number;
   };
-  points: Points;
+  points?: Points;
+  backgroundColor?: number;
 };
