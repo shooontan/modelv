@@ -90,6 +90,11 @@ export const MMD = () => {
         )
       );
 
+      const quaternionLeftArm = new THREE.Quaternion();
+      quaternionLeftArm.setFromEuler(new THREE.Euler(0.1, -0.3, -0.5, 'XYZ'));
+      const quaternionRightArm = new THREE.Quaternion();
+      quaternionRightArm.setFromEuler(new THREE.Euler(0.1, -0.3, 0.5, 'XYZ'));
+
       const vpd = {
         bones: [
           {
@@ -110,6 +115,26 @@ export const MMD = () => {
               quaternionBody.y,
               quaternionBody.z,
               quaternionBody.w,
+            ],
+          },
+          {
+            name: '左腕',
+            translation: [0, 0, 0],
+            quaternion: [
+              quaternionLeftArm.x,
+              quaternionLeftArm.y,
+              quaternionLeftArm.z,
+              quaternionLeftArm.w,
+            ],
+          },
+          {
+            name: '右腕',
+            translation: [0, 0, 0],
+            quaternion: [
+              quaternionRightArm.x,
+              quaternionRightArm.y,
+              quaternionRightArm.z,
+              quaternionRightArm.w,
             ],
           },
         ],
