@@ -47,7 +47,8 @@ export const TopMain: React.FC = () => {
           padding: 1em 0;
           width: 100%;
           max-width: 800px;
-          line-height: 1.6;
+          line-height: 1.8;
+          box-sizing: border-box;
         }
 
         h2 {
@@ -56,6 +57,12 @@ export const TopMain: React.FC = () => {
 
         article {
           margin: 0 0 80px;
+        }
+
+        @media (max-width: 879px) {
+          main {
+            padding: 0 1em;
+          }
         }
       `}</style>
     </>

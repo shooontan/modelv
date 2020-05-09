@@ -5,6 +5,7 @@ import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnec
 // import { EulerAnglePanel } from '@/components/molecules/EulerAnglePanel';
 import { ControlPanel } from '@/components/molecules/ControlPanel/ControlPanel';
 import { BackgroundColorPanel } from '@/components/molecules/BackgroundColorPanel/BackgroundColorPanel';
+import { AppFooter } from '@/components/orgamisms/Footer/AppFooter';
 
 const DynamicOpenCV = dynamic(() => import('@/components/OpenCV'), {
   ssr: false,
@@ -31,6 +32,7 @@ const Home = () => {
       <DynamicOpenCV />
       <Camera />
       <ControlPanel lists={items}></ControlPanel>
+      <AppFooter />
       <style jsx>{`
         div {
           margin: 0 auto;

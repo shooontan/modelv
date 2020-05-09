@@ -2,6 +2,7 @@ import React from 'react';
 import { TopHeader } from '@/components/orgamisms/Header/TopHeader';
 import { HeroHeader } from '@/components/orgamisms/Header/HeroHeader';
 import { TopMain } from '@/components/orgamisms/Main/TopMain';
+import { AppFooter } from '@/components/orgamisms/Footer/AppFooter';
 
 const Home: React.FC = () => {
   return (
@@ -9,6 +10,7 @@ const Home: React.FC = () => {
       <TopHeader />
       <HeroHeader />
       <TopMain />
+      <AppFooter />
     </>
   );
 };

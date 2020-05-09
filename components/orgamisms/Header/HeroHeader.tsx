@@ -1,5 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const DynamicArrowIcon = dynamic(
+  // @ts-ignore
+  () => import('@/components/atoms/Icon/Arrow').then((mod) => mod.Arrow),
+  {
+    ssr: false,
+  }
+);
 
 export const HeroHeader: React.FC = () => {
   return (
@@ -11,8 +20,23 @@ export const HeroHeader: React.FC = () => {
 
       <style jsx>{`
         .hero {
-          padding: 60px 0;
+          padding: 60px 20px;
           background: radial-gradient(70% 70% at 50% 100%, #eee 0, #fff 100%);
+          box-sizing: border-box;
+        }
+
+        @media (max-width: 879px) {
+          .hero {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 680px;
+          }
+        }
+
+        @media (max-width: 419px) {
+          .hero {
+            padding: 30px 20px;
+          }
         }
       `}</style>
     </>
@@ -54,6 +78,7 @@ const HeroVideo: React.FC = () => {
             onCanPlay={() => typeof wstate !== 'boolean' && setWState(true)}
           />
         </div>
+        <ArrowAnimation />
         <div className="video model">
           <img src="/imgs/header-b.png" alt="" />
           <video
@@ -91,6 +116,97 @@ const HeroVideo: React.FC = () => {
 
         .videos video {
           width: 300px;
+        }
+
+        @media (max-width: 879px) {
+          .videos {
+            display: block;
+            text-align: center;
+          }
+
+          .video.model {
+            margin: 0 0 0 auto;
+          }
+        }
+
+        @media (max-width: 419px) {
+          .video {
+            width: 80%;
+            height: auto;
+          }
+
+          .video video {
+            width: 100%;
+          }
+        }
+      `}</style>
+    </>
+  );
+};
+
+const ArrowAnimation = () => {
+  const Items = Array.from({ length: 5 }).map((_, idx) => (
+    <React.Fragment key={idx}>
+      <DynamicArrowIcon />
+      <style jsx>{`
+        :global(svg) {
+          animation: anime 2.5s infinite both;
+        }
+
+        :global(svg):nth-child(5n + 1) {
+          animation-delay: 0s;
+        }
+
+        :global(svg):nth-child(5n + 2) {
+          animation-delay: 0.5s;
+        }
+        :global(svg):nth-child(5n + 3) {
+          animation-delay: 1s;
+        }
+
+        :global(svg):nth-child(5n + 4) {
+          animation-delay: 1.5s;
+        }
+
+        :global(svg):nth-child(5n) {
+          animation-delay: 2s;
+        }
+
+        @keyframes anime {
+          0% {
+            opacity: 0;
+          }
+          25% {
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+          }
+        }
+
+        @media (max-width: 879px) {
+          :global(svg) {
+            display: none;
+          }
+        }
+      `}</style>
+    </React.Fragment>
+  ));
+
+  return (
+    <>
+      <div>{Items}</div>
+      <style jsx>{`
+        div {
+          display: flex;
+          margin: 0;
+          padding: 24px 0 0;
+          width: 100px;
+          justify-content: center;
+          align-items: center;
         }
       `}</style>
     </>
@@ -157,6 +273,32 @@ const PageLink: React.FC = () => {
         .link a:hover {
           background: #fafafa;
           color: #333;
+        }
+
+        @media (max-width: 879px) {
+          .links {
+            justify-content: space-around;
+          }
+
+          .item {
+            padding: 0;
+            width: 150px;
+            height: 40px;
+          }
+        }
+
+        @media (max-width: 419px) {
+          .links {
+            display: block;
+          }
+
+          .item {
+            margin: 0 auto 20px;
+          }
+
+          .item:last-child {
+            margin-bottom: 0;
+          }
         }
       `}</style>
     </>

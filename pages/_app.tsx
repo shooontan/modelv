@@ -16,6 +16,10 @@ const App: NextComponentType<AppContextType, AppProps, AppPropsType> = ({
   return (
     <>
       <Head>
+        <meta
+          name="viewport"
+          content="width=device-width,initial-scale=1,user-scalable=no"
+        />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
@@ -44,6 +48,9 @@ const App: NextComponentType<AppContextType, AppProps, AppPropsType> = ({
       </Providers>
       <style jsx global>{`
         body {
+          font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN',
+            'Hiragino Sans', Meiryo, sans-serif;
+          letter-spacing: 1.2px;
           overflow-y: scroll;
         }
       `}</style>
