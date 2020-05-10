@@ -1,0 +1,33 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    name: Test on node 12
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set Node.js 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Run
+        run: |
+          npm ci
+          npm run lint
+          npm run typecheck
+          npm test
+  build:
+    name: Build on node 12
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set Node.js 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Build
+        run: |
+          npm ci
+          npm run build
