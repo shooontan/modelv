@@ -1,7 +1,7 @@
 {
-  "name": "vtuber",
+  "name": "modelv",
   "version": "1.0.0",
-  "description": "",
+  "description": "This web app allows us to become a virtual model with a webcam and a browser.",
   "main": "index.js",
   "scripts": {
     "dev": "next",
@@ -12,7 +12,11 @@
     "typecheck": "tsc"
   },
   "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shooontan/modelv.git"
+  },
+  "license": "MIT",
   "dependencies": {
     "@tensorflow/tfjs-node": "^1.7.2",
     "face-api.js": "^0.22.2",
