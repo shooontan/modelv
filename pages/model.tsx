@@ -1,6 +1,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { AnswerPeerConnection } from '@/components/PeerConnection/AnswerPeerConnection';
+import { Seo } from '@/components/atoms/Seo';
 
 const DynamicMMD = dynamic(() => import('@/components/MMD'), {
   ssr: false,
@@ -9,6 +10,10 @@ const DynamicMMD = dynamic(() => import('@/components/MMD'), {
 function Home() {
   return (
     <>
+      <Seo
+        title={'モデル - ' + process.env.APP_TITLE}
+        canonical={process.env.APP_URL + 'model'}
+      />
       <DynamicMMD />
       <AnswerPeerConnection />
       <style jsx global>{`

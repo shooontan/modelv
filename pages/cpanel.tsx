@@ -6,6 +6,7 @@ import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnec
 import { ControlPanel } from '@/components/molecules/ControlPanel/ControlPanel';
 import { BackgroundColorPanel } from '@/components/molecules/BackgroundColorPanel/BackgroundColorPanel';
 import { AppFooter } from '@/components/orgamisms/Footer/AppFooter';
+import { Seo } from '@/components/atoms/Seo';
 
 const DynamicOpenCV = dynamic(() => import('@/components/OpenCV'), {
   ssr: false,
@@ -29,6 +30,10 @@ const Home = () => {
   ];
   return (
     <>
+      <Seo
+        title={'操作パネル - ' + process.env.APP_TITLE}
+        canonical={process.env.APP_URL + 'cpanel'}
+      />
       <DynamicOpenCV />
       <Camera />
       <ControlPanel lists={items}></ControlPanel>

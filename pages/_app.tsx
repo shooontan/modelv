@@ -6,6 +6,7 @@ import {
   NextComponentType,
 } from 'next/dist/next-server/lib/utils';
 import { Providers, HeadPose, Landmark, Model } from '@/context';
+import { Seo } from '@/components/atoms/Seo';
 
 type AppProps = {};
 
@@ -15,6 +16,10 @@ const App: NextComponentType<AppContextType, AppProps, AppPropsType> = ({
 }) => {
   return (
     <>
+      <Seo
+        title={process.env.APP_TITLE + ' | ' + process.env.APP_DESCRIPTION}
+        ogImage={process.env.APP_URL + 'media/ogp.gif'}
+      />
       <Head>
         <meta
           name="viewport"
