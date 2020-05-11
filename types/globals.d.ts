@@ -1,5 +1,6 @@
 interface Window {
   cv: OpenCVJS;
+  gtag: GTag;
 }
 
 declare namespace NodeJS {
@@ -7,5 +8,7 @@ declare namespace NodeJS {
     APP_URL: string;
     APP_TITLE: string;
     APP_DESCRIPTION: string;
+
+    GOOGLE_ANALYTICS_MEASUREMENT_ID: string;
   }
 }

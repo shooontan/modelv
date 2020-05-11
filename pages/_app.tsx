@@ -7,6 +7,7 @@ import {
 } from 'next/dist/next-server/lib/utils';
 import { Providers, HeadPose, Landmark, Model } from '@/context';
 import { Seo } from '@/components/atoms/Seo';
+import { GAnalytics } from '@/components/services/GAnalytics';
 
 type AppProps = {};
 
@@ -37,6 +38,7 @@ const App: NextComponentType<AppContextType, AppProps, AppPropsType> = ({
           crossOrigin="anonymous"
         />
       </Head>
+      <GAnalytics measurementId={process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID} />
       <Providers
         providers={[
           <Landmark.Points.Provider key="points">{}</Landmark.Points.Provider>,
