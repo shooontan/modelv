@@ -18,7 +18,12 @@ const App: NextComponentType<AppContextType, AppProps, AppPropsType> = ({
     <>
       <Seo
         title={process.env.APP_TITLE + ' | ' + process.env.APP_DESCRIPTION}
+        ogTitle={process.env.APP_TITLE}
+        ogDescription={process.env.APP_DESCRIPTION}
         ogImage={process.env.APP_URL + 'media/ogp.gif'}
+        twitterCard="summary"
+        twitterTitle={process.env.APP_TITLE}
+        twitterDescription={process.env.APP_DESCRIPTION}
       />
       <Head>
         <meta

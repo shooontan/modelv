@@ -9,6 +9,9 @@ type SeoProps = {
   ogImage?: string;
   ogDescription?: string;
   canonical?: string;
+  twitterCard?: 'summary';
+  twitterTitle?: string;
+  twitterDescription?: string;
 };
 
 export const Seo: React.FC<SeoProps> = (props) => {
@@ -25,6 +28,22 @@ export const Seo: React.FC<SeoProps> = (props) => {
         <meta property="og:description" content={props.ogDescription} />
       )}
       {props.canonical && <link rel="canonical" href={props.canonical} />}
+      {props.twitterCard && (
+        <meta name="twitter:card" content={props.twitterCard} />
+      )}
+      {(props.twitterTitle || props.ogTitle) && (
+        <meta
+          name="twitter:title"
+          content={props.twitterTitle || props.ogTitle}
+        />
+      )}
+      {(props.twitterDescription || props.ogDescription) && (
+        <meta
+          name="twitter:description"
+          content={props.twitterDescription || props.ogDescription}
+        />
+      )}
+      {props.ogImage && <meta name="twitter:image" content={props.ogImage} />}
     </Head>
   );
 };

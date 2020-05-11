@@ -4,7 +4,7 @@ module.exports = withTM({
   env: {
     APP_URL: 'https://modelv.mahoroi.com/',
     APP_TITLE: 'ModelV.',
-    APP_DESCRIPTION: 'webカメラとブラウザでバーチャルモデルになれるWebアプリ',
+    APP_DESCRIPTION: 'webカメラとブラウザでバーチャルモデルになれるwebアプリ',
   },
   webpack: (config) => {
     return {
