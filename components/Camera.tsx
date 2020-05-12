@@ -5,6 +5,7 @@ import { Landmark } from '@/context/Landmark';
 import { KalmanFilter } from '@/libs/KalmanFilter';
 import { mediaStreamErrorType } from '@/libs/media/error';
 import { Button } from '@/components/atoms/Button';
+import { MediaDeviceHelper } from '@/libs/media/MediaDevice';
 
 type Size = [number, number];
 const DEFAULT_CANVAS_SIZE: Size = [640, 480];
@@ -47,7 +48,10 @@ function formatPoint(
   return [x, y];
 }
 
+const MDHelper: MediaDeviceHelper = new MediaDeviceHelper();
+
 export const Camera = () => {
+  const unmounted = React.useRef<boolean>(false);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
@@ -60,12 +64,17 @@ export const Camera = () => {
     DEFAULT_CANVAS_SIZE
   );
 
+  React.useEffect(() => {
+    return () => {
+      MDHelper.clearAllStream();
+      unmounted.current = true;
+    };
+  }, []);
+
   /**
    * load face-api.js models
    */
   React.useEffect(() => {
-    let unmount = false;
-
     loadNets();
     async function loadNets() {
       try {
@@ -75,45 +84,11 @@ export const Camera = () => {
         ]);
 
         // model loading is complate
-        !unmount && setIsLoadedModel(true);
+        !unmounted.current && setIsLoadedModel(true);
       } catch (error) {
         console.log(error);
       }
     }
-
-    return () => {
-      unmount = true;
-    };
-  }, []);
-
-  /**
-   * stop camera stream track
-   */
-  React.useEffect(() => {
-    return () => {
-      /* eslint-disable-next-line react-hooks/exhaustive-deps */
-      const video = videoRef.current;
-      const stream = video?.srcObject;
-      if (stream instanceof MediaStream) {
-        stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-      } else {
-        /**
-         * TODO: fix
-         * When user go back page soon, can not stop track because stream is not started and 'null'.
-         * To deal with this problem, use settimeout.
-         */
-        setTimeout(() => {
-          const stream = video?.srcObject;
-          if (stream instanceof MediaStream) {
-            stream.getTracks().forEach((track) => {
-              track.stop();
-            });
-          }
-        }, 1000);
-      }
-    };
   }, []);
 
   /**
@@ -124,21 +99,22 @@ export const Camera = () => {
       return;
     }
 
-    let unmount = false;
-
     detect();
     async function detect() {
       const video = videoRef.current;
+      const stream = video?.srcObject;
       const canvas = canvasRef.current;
-      if (!video || !canvas) {
+      if (!video || !canvas || !MediaDeviceHelper.isMediaStream(stream)) {
         return console.log('video or canvas is null');
       }
 
-      !unmount && cameraStatus === 'active' && requestAnimationFrame(detect);
+      if (cameraStatus !== 'active') {
+        return console.log('camera is not active');
+      }
 
-      const trackSettings = (video.srcObject as MediaStream)
-        .getTracks()[0]
-        .getSettings();
+      requestAnimationFrame(detect);
+
+      const trackSettings = stream.getTracks()[0].getSettings();
       const { width, height } = trackSettings;
 
       const isNum = (value: any): value is number => typeof value === 'number';
@@ -148,7 +124,7 @@ export const Camera = () => {
         videoWidth !== videoStreamSize[0] ||
         videoHeight !== videoStreamSize[1]
       ) {
-        setVideoStreamSize([videoWidth, videoHeight]);
+        !unmounted.current && setVideoStreamSize([videoWidth, videoHeight]);
       }
 
       //  get facedata from webcam
@@ -189,7 +165,7 @@ export const Camera = () => {
       const leftOutline = landmarks.getJawOutline()[0];
       const rightOutline = landmarks.getJawOutline()[16];
 
-      !unmount &&
+      !unmounted.current &&
         setPoints({
           nose: formatPoint('nose', nose),
           leftEye: formatPoint('leftEye', leftEye),
@@ -203,10 +179,6 @@ export const Camera = () => {
           rightOutline: formatPoint('rightOutline', rightOutline),
         });
     }
-
-    return () => {
-      unmount = true;
-    };
   }, [cameraStatus, isLoadedModel, videoStreamSize, setPoints]);
 
   /**
@@ -215,30 +187,40 @@ export const Camera = () => {
   const onClickCamera = React.useCallback(async () => {
     if (cameraStatus === 'active') {
       const stream = videoRef.current?.srcObject;
-      if (stream instanceof MediaStream) {
-        stream.getTracks().forEach((s) => {
-          s.stop();
-        });
-        setCameraStatus('inactive');
+      if (MediaDeviceHelper.isMediaStream(stream)) {
+        MDHelper.clearStream(stream.id);
+        !unmounted.current && setCameraStatus('inactive');
       }
     }
+
     if (cameraStatus === 'inactive') {
       const video = videoRef.current;
-      if (video) {
-        try {
-          // await createStream(video);
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: true,
-          });
-          video.srcObject = stream;
-          await video.play();
-          setCameraStatus('active');
-        } catch (error) {
-          console.log(error);
-          const errorType = mediaStreamErrorType(error);
-          console.log(errorType);
+      if (!video) return;
+
+      try {
+        await MDHelper.confirmPermission();
+        const videoDevices = await MDHelper.getVideoDevices();
+
+        const deviceId = videoDevices[0]?.deviceId || undefined;
+        if (!deviceId) {
+          throw new Error('not found webcam');
         }
+
+        const stream = await MDHelper.getVideoStream(deviceId);
+        video.srcObject = stream;
+        await video.play();
+        !unmounted.current && setCameraStatus('active');
+
+        // stop stream when user go back page soon.
+        if (unmounted.current) {
+          MediaDeviceHelper.clean(stream);
+        }
+      } catch (error) {
+        console.log(error);
+        const errorType = mediaStreamErrorType(error);
+        console.log(errorType);
+        // stop all stream
+        MDHelper.clearAllStream();
       }
     }
   }, [cameraStatus]);
