@@ -3,6 +3,8 @@ interface OpenCVJS {
 
   Mat: OpenCV.IMat;
 
+  getBuildInformation(): string;
+
   matFromArray(
     rows: number,
     cols: number,

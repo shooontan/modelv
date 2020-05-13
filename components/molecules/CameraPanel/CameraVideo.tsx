@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { landmark } from '@/modules';
 import { useFaceDetect } from '@/components/hooks/useFaceDetect';
+import { CameraHeadposeAngle } from './CameraHeadposeAngle';
 
 type CameraVideoProps = {
   active: boolean;
@@ -11,6 +12,7 @@ type CameraVideoProps = {
 export const CameraVideo: React.FC<CameraVideoProps> = (props) => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const canvasAngleRef = React.useRef<HTMLCanvasElement>(null);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -61,11 +63,13 @@ export const CameraVideo: React.FC<CameraVideoProps> = (props) => {
             width={videoDomSize.width}
             height={videoDomSize.height}
           />
-          <canvas
-            id="canvas2"
-            width={videoDomSize.width}
-            height={videoDomSize.height}
-          />
+          <CameraHeadposeAngle canvasRef={canvasAngleRef}>
+            <canvas
+              ref={canvasAngleRef}
+              width={videoDomSize.width}
+              height={videoDomSize.height}
+            />
+          </CameraHeadposeAngle>
         </div>
       </div>
 

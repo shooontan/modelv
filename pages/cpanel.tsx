@@ -1,5 +1,4 @@
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { CameraPanel } from '@/components/molecules/CameraPanel/CameraPanel';
 import { OfferPeerConnection } from '@/components/services/PeerConnection/OfferPeerConnection';
 // import { EulerAnglePanel } from '@/components/molecules/EulerAnglePanel';
@@ -7,10 +6,7 @@ import { ControlPanel } from '@/components/molecules/ControlPanel/ControlPanel';
 import { BackgroundColorPanel } from '@/components/molecules/BackgroundColorPanel/BackgroundColorPanel';
 import { AppFooter } from '@/components/orgamisms/Footer/AppFooter';
 import { Seo } from '@/components/atoms/Seo';
-
-const DynamicOpenCV = dynamic(() => import('@/components/OpenCV'), {
-  ssr: false,
-});
+import { HeadPose } from '@/components/services/HeadPose';
 
 const Home = () => {
   const items = [
@@ -34,7 +30,7 @@ const Home = () => {
         title={'操作パネル - ' + process.env.APP_TITLE}
         canonical={process.env.APP_URL + 'cpanel'}
       />
-      <DynamicOpenCV />
+      <HeadPose />
       <CameraPanel />
       <ControlPanel lists={items}></ControlPanel>
       <AppFooter />

@@ -2,7 +2,7 @@ node_modules
 public/models
 .next
 snapweb_js
-opencv
+/opencv
 public/js
 coverage
 .env
