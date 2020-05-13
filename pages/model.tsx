@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { AnswerPeerConnection } from '@/components/PeerConnection/AnswerPeerConnection';
+import { AnswerPeerConnection } from '@/components/services/PeerConnection/AnswerPeerConnection';
 import { Seo } from '@/components/atoms/Seo';
 
 const DynamicMMD = dynamic(() => import('@/components/MMD'), {

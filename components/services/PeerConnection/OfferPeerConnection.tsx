@@ -1,15 +1,24 @@
 import React from 'react';
-import { HeadPose, Landmark, Model } from '@/context';
+import { useSelector } from 'react-redux';
 import { aikotoba } from '@/libs/aikotoba';
 import { usePeerConnection } from '@/components/hooks/usePeer';
 import { Button } from '@/components/atoms/Button';
 import { Icon } from '@/components/atoms/Icon';
 import { DataFormat } from './types';
+import { RootState } from '@/modules';
+
+type SelectState = {
+  points: RootState['landmark']['points'];
+  eulerAngles: RootState['headpose']['eulerAngles'];
+  bgColor: RootState['model']['backgroundColor'];
+};
 
 export const OfferPeerConnection = () => {
-  const [eulerAngles] = HeadPose.EulerAngles.useContainer();
-  const [points] = Landmark.Points.useContainer();
-  const [bgColor] = Model.BackgroundColor.useContainer();
+  const selectState = useSelector<RootState, SelectState>((state) => ({
+    points: state.landmark.points,
+    eulerAngles: state.headpose.eulerAngles,
+    bgColor: state.model.backgroundColor,
+  }));
 
   // for connection
   const [answerSDP, setAnswerSDP] = React.useState('');
@@ -31,16 +40,21 @@ export const OfferPeerConnection = () => {
     }
 
     const data: DataFormat = {
-      eulerAngles,
-      points,
-      backgroundColor: bgColor,
+      eulerAngles: selectState.eulerAngles,
+      points: selectState.points,
+      backgroundColor: selectState.bgColor,
     };
     try {
       dataChannel.send(JSON.stringify(data));
     } catch (error) {
       console.log(error);
     }
-  }, [dataChannel, eulerAngles, points, bgColor]);
+  }, [
+    dataChannel,
+    selectState.eulerAngles,
+    selectState.points,
+    selectState.bgColor,
+  ]);
 
   /**
    * answer

@@ -1,7 +1,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { CameraPanel } from '@/components/molecules/CameraPanel/CameraPanel';
-import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnection';
+import { OfferPeerConnection } from '@/components/services/PeerConnection/OfferPeerConnection';
 // import { EulerAnglePanel } from '@/components/molecules/EulerAnglePanel';
 import { ControlPanel } from '@/components/molecules/ControlPanel/ControlPanel';
 import { BackgroundColorPanel } from '@/components/molecules/BackgroundColorPanel/BackgroundColorPanel';

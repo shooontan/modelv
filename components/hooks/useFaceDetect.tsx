@@ -1,7 +1,7 @@
 import React from 'react';
 import * as faceapi from 'face-api.js';
 import { MediaDeviceHelper } from '@/libs/media/MediaDevice';
-import { Points } from '@/context/Landmark';
+import { Points } from '@/modules/landmark';
 import { KalmanFilter } from '@/libs/KalmanFilter';
 
 type Config = {

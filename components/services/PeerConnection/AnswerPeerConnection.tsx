@@ -1,14 +1,14 @@
 import React from 'react';
-import { HeadPose, Landmark, Model } from '@/context';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { landmark, headpose, model } from '@/modules';
 import { aikotoba } from '@/libs/aikotoba';
 import { usePeerConnection } from '@/components/hooks/usePeer';
 import { Button } from '@/components/atoms/Button';
 import { DataFormat } from './types';
 
 export const AnswerPeerConnection = () => {
-  const [, setEulerAngles] = HeadPose.EulerAngles.useContainer();
-  const [, setPoints] = Landmark.Points.useContainer();
-  const [, setBgColor] = Model.BackgroundColor.useContainer();
+  const dispatch = useDispatch<AppDispatch>();
 
   // for connection
   const [offerSDP, setOfferSDP] = React.useState('');
@@ -22,19 +22,25 @@ export const AnswerPeerConnection = () => {
   } = usePeerConnection();
 
   /**
-   * send data
+   * recieve data
    */
-  React.useEffect(() => {
-    if (!dataChannel) {
-      return;
-    }
-    dataChannel.onmessage = (e) => {
-      const data = JSON.parse(e.data) as DataFormat;
-      data.eulerAngles && setEulerAngles(data.eulerAngles);
-      data.points && setPoints(data.points);
-      data.backgroundColor && setBgColor(data.backgroundColor);
-    };
-  }, [dataChannel, setEulerAngles, setPoints, setBgColor]);
+  React.useEffect(
+    () => {
+      if (!dataChannel) {
+        return;
+      }
+      dataChannel.onmessage = (e) => {
+        const data = JSON.parse(e.data) as DataFormat;
+        data.eulerAngles &&
+          dispatch(headpose.actions.updateEulerAngles(data.eulerAngles));
+        data.points && dispatch(landmark.actions.updatePoints(data.points));
+        typeof data.backgroundColor === 'number' &&
+          dispatch(model.actions.updateBackgroundColor(data.backgroundColor));
+      };
+    },
+    /* eslint-disable react-hooks/exhaustive-deps */
+    [dataChannel]
+  );
 
   /**
    * copy sdp

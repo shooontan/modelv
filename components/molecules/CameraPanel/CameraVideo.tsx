@@ -1,5 +1,7 @@
 import React from 'react';
-import { Landmark } from '@/context';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { landmark } from '@/modules';
 import { useFaceDetect } from '@/components/hooks/useFaceDetect';
 
 type CameraVideoProps = {
@@ -10,7 +12,7 @@ export const CameraVideo: React.FC<CameraVideoProps> = (props) => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  const [, setPoints] = Landmark.Points.useContainer();
+  const dispatch = useDispatch<AppDispatch>();
 
   const {
     points,
@@ -31,7 +33,7 @@ export const CameraVideo: React.FC<CameraVideoProps> = (props) => {
 
   React.useEffect(
     () => {
-      setPoints(points);
+      dispatch(landmark.actions.updatePoints(points));
     },
     /* eslint-disable react-hooks/exhaustive-deps */
     [points]

@@ -5,14 +5,25 @@ import Document, {
   Main,
   NextScript,
   DocumentContext,
+  DocumentProps,
 } from 'next/document';
 import { resetIdCounter } from 'react-tabs';
+import { store } from '@/store';
+import { RootState } from '@/modules';
 
-export default class MyDocument extends Document {
+type Props = DocumentProps & {
+  initialState: RootState;
+};
+
+export default class MyDocument extends Document<Props> {
   static async getInitialProps(ctx: DocumentContext) {
     resetIdCounter();
     const initialProps = await Document.getInitialProps(ctx);
-    return initialProps;
+    const initialState = store.getState();
+    return {
+      ...initialProps,
+      initialState,
+    };
   }
 
   render() {

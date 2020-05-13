@@ -1,9 +1,10 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import * as THREE from 'three';
-import { HeadPose, Landmark, Model } from '@/context';
 import { KalmanFilter } from '@/libs/KalmanFilter';
 import { useMMD } from '@/components/hooks/useThree';
 import { Input } from '@/components/atoms/Input';
+import { RootState } from '@/modules';
 
 const CANVAS_SIZE = [640, 480] as const;
 
@@ -13,12 +14,20 @@ const kfilter = new KalmanFilter({
   Q: 3,
 });
 
+type SelectState = {
+  eulerAngles: RootState['headpose']['eulerAngles'];
+  points: RootState['landmark']['points'];
+  bgColor: RootState['model']['backgroundColor'];
+};
+
 export const MMD = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  const [eulerAngles] = HeadPose.EulerAngles.useContainer();
-  const [points] = Landmark.Points.useContainer();
-  const [bgColor] = Model.BackgroundColor.useContainer();
+  const selectState = useSelector<RootState, SelectState>((state) => ({
+    eulerAngles: state.headpose.eulerAngles,
+    points: state.landmark.points,
+    bgColor: state.model.backgroundColor,
+  }));
 
   const [size, setSize] = React.useState<[number, number]>([
     CANVAS_SIZE[0],
@@ -65,6 +74,8 @@ export const MMD = () => {
 
   React.useEffect(
     () => {
+      const { eulerAngles, points } = selectState;
+
       if (!eulerAngles || !mesh || !helper) {
         return;
       }
@@ -160,7 +171,7 @@ export const MMD = () => {
       helper.pose(mesh, vpd);
     },
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    [eulerAngles, points]
+    [selectState.eulerAngles, selectState.points]
   );
 
   /**
@@ -169,11 +180,11 @@ export const MMD = () => {
   React.useEffect(
     () => {
       if (scene) {
-        scene.background = new THREE.Color(bgColor);
+        scene.background = new THREE.Color(selectState.bgColor);
       }
     },
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    [bgColor]
+    [selectState.bgColor]
   );
 
   const animation = React.useCallback(() => {

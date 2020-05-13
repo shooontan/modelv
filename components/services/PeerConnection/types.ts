@@ -1,4 +1,4 @@
-import { Points } from '@/context/Landmark';
+import { Points } from '@/modules/landmark';
 
 export type DataFormat = {
   eulerAngles?: {

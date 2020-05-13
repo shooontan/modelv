@@ -1,9 +1,4 @@
 import React from 'react';
-import { HeadPose } from '@/context/HeadPose';
-import { Landmark } from '@/context/Landmark';
-import { Model } from '@/context/Model';
-
-export { HeadPose, Landmark, Model };
 
 export interface ProvidersProps {
   providers: React.ReactElement[];

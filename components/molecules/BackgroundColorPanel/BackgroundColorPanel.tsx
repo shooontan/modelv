@@ -1,5 +1,7 @@
 import React from 'react';
-import { Model } from '@/context';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { model } from '@/modules/model';
 
 type Color = {
   id: string;
@@ -33,12 +35,18 @@ const colors: Color[] = [
 export type EulerAnglePanelProps = {};
 
 export const BackgroundColorPanel: React.FC<EulerAnglePanelProps> = () => {
-  const [, setBgColor] = Model.BackgroundColor.useContainer();
+  const dispatch = useDispatch<AppDispatch>();
 
   const buttons = colors.map((color) => {
     return (
       <React.Fragment key={color.id}>
-        <button onClick={() => setBgColor(color.hex)}>{color.name}</button>
+        <button
+          onClick={() =>
+            dispatch(model.actions.updateBackgroundColor(color.hex))
+          }
+        >
+          {color.name}
+        </button>
         <style jsx>{`
           button {
             display: inline-block;
