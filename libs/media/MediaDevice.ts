@@ -16,6 +16,12 @@ export class MediaDeviceHelper {
       audio: false,
       video: {
         deviceId: deviceId,
+        width: {
+          ideal: 640,
+        },
+        height: {
+          ideal: 480,
+        },
       },
     });
     this.addStream(stream);

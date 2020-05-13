@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Camera } from '@/components/Camera';
+import { CameraPanel } from '@/components/molecules/CameraPanel/CameraPanel';
 import { OfferPeerConnection } from '@/components/PeerConnection/OfferPeerConnection';
 // import { EulerAnglePanel } from '@/components/molecules/EulerAnglePanel';
 import { ControlPanel } from '@/components/molecules/ControlPanel/ControlPanel';
@@ -35,7 +35,7 @@ const Home = () => {
         canonical={process.env.APP_URL + 'cpanel'}
       />
       <DynamicOpenCV />
-      <Camera />
+      <CameraPanel />
       <ControlPanel lists={items}></ControlPanel>
       <AppFooter />
       <style jsx>{`
