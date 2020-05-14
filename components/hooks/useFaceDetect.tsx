@@ -1,8 +1,8 @@
 import React from 'react';
 import * as faceapi from 'face-api.js';
 import { MediaDeviceHelper } from '@/libs/media/MediaDevice';
-import { Points } from '@/modules/landmark';
-import { KalmanFilter } from '@/libs/KalmanFilter';
+
+const RENDER_THROTTLE = 5;
 
 type Config = {
   active: boolean;
@@ -13,42 +13,6 @@ type Config = {
     height: number;
   };
 };
-
-type LandmarkName =
-  | 'nose'
-  | 'leftEye'
-  | 'rightEye'
-  | 'jaw'
-  | 'leftMouth'
-  | 'rightMouth'
-  | 'upperLip'
-  | 'lowerLip'
-  | 'leftOutline'
-  | 'rightOutline';
-
-const kfilter = {
-  nose: new KalmanFilter(),
-  leftEye: new KalmanFilter(),
-  rightEye: new KalmanFilter(),
-  jaw: new KalmanFilter(),
-  leftMouth: new KalmanFilter(),
-  rightMouth: new KalmanFilter(),
-  upperLip: new KalmanFilter(),
-  lowerLip: new KalmanFilter(),
-  leftOutline: new KalmanFilter(),
-  rightOutline: new KalmanFilter(),
-};
-
-function formatPoint(
-  name: LandmarkName,
-  point?: faceapi.Point
-): [number, number] | undefined {
-  if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
-    return undefined;
-  }
-  const [x, y] = kfilter[name].filter([point.x, point.y]);
-  return [x, y];
-}
 
 const isNum = (value: any): value is number => typeof value === 'number';
 
@@ -61,11 +25,23 @@ const MDHelper = new MediaDeviceHelper();
 export function useFaceDetect(config: Config) {
   const { videoRef, canvasRef } = config;
   const unmounted = React.useRef<boolean>(false);
-  const [points, setPoints] = React.useState<Points>({});
+  const [points, setPoints] = React.useState<{
+    nose?: faceapi.Point;
+    leftEye?: faceapi.Point;
+    rightEye?: faceapi.Point;
+    leftMouth?: faceapi.Point;
+    rightMouth?: faceapi.Point;
+    upperLip?: faceapi.Point;
+    lowerLip?: faceapi.Point;
+    jaw?: faceapi.Point;
+    leftOutline?: faceapi.Point;
+    rightOutline?: faceapi.Point;
+  }>({});
   const [videoStreamSize, setVideoStreamSize] = React.useState<{
     width: number;
     height: number;
   }>(config.videoSize);
+  const [renderCount, setRenderCount] = React.useState<number>(0);
 
   React.useEffect(() => {
     return () => {
@@ -112,7 +88,7 @@ export function useFaceDetect(config: Config) {
   };
 
   const detect = React.useCallback(
-    async () => {
+    async (renderThrottleCount: number) => {
       const video = videoRef.current;
       const stream = video?.srcObject;
       const canvas = canvasRef.current;
@@ -125,7 +101,13 @@ export function useFaceDetect(config: Config) {
         return console.log('not exist video stream');
       }
 
-      requestAnimationFrame(detect);
+      // skip anime in 4/5
+      const nextRenderCount = (renderThrottleCount + 1) % RENDER_THROTTLE;
+      requestAnimationFrame(() => detect(nextRenderCount));
+      if (renderThrottleCount !== 0) {
+        !unmounted && setRenderCount(nextRenderCount);
+        return;
+      }
 
       if (!isModelLoaded()) {
         return;
@@ -184,16 +166,16 @@ export function useFaceDetect(config: Config) {
 
       !unmounted.current &&
         setPoints({
-          nose: formatPoint('nose', nose),
-          leftEye: formatPoint('leftEye', leftEye),
-          rightEye: formatPoint('rightEye', rightEye),
-          jaw: formatPoint('jaw', jaw),
-          leftMouth: formatPoint('leftMouth', leftMouth),
-          rightMouth: formatPoint('rightMouth', rightMouth),
-          upperLip: formatPoint('upperLip', upperLip),
-          lowerLip: formatPoint('lowerLip', lowerLip),
-          leftOutline: formatPoint('leftOutline', leftOutline),
-          rightOutline: formatPoint('rightOutline', rightOutline),
+          nose,
+          leftEye,
+          rightEye,
+          jaw,
+          leftMouth,
+          rightMouth,
+          upperLip,
+          lowerLip,
+          leftOutline,
+          rightOutline,
         });
     },
     /* eslint-disable react-hooks/exhaustive-deps */
@@ -214,6 +196,7 @@ export function useFaceDetect(config: Config) {
     points,
     isLandscapeVideoStream,
     videoDomSize,
+    renderCount,
     createStream,
     detect,
     stopDetect,

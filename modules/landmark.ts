@@ -17,10 +17,12 @@ export type Points = {
 
 type State = {
   points: Points;
+  renderThrottle: number;
 };
 
 const initialState: State = {
   points: {},
+  renderThrottle: 0,
 };
 
 export const landmark = createSlice({
@@ -30,6 +32,13 @@ export const landmark = createSlice({
     updatePoints: (state, action: PayloadAction<Points>) => ({
       ...state,
       points: action.payload,
+    }),
+    updateRenderThrottle: (
+      state,
+      action: PayloadAction<State['renderThrottle']>
+    ) => ({
+      ...state,
+      renderThrottle: action.payload,
     }),
   },
 });

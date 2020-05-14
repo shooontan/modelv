@@ -3,9 +3,12 @@ import dynamic from 'next/dynamic';
 import { AnswerPeerConnection } from '@/components/services/PeerConnection/AnswerPeerConnection';
 import { Seo } from '@/components/atoms/Seo';
 
-const DynamicMMD = dynamic(() => import('@/components/MMD'), {
-  ssr: false,
-});
+const DynamicMMDCanvas = dynamic(
+  () => import('@/components/services/ModelCanvas/MMDCanvas'),
+  {
+    ssr: false,
+  }
+);
 
 function Home() {
   return (
@@ -14,7 +17,7 @@ function Home() {
         title={'モデル - ' + process.env.APP_TITLE}
         canonical={process.env.APP_URL + 'model'}
       />
-      <DynamicMMD />
+      <DynamicMMDCanvas />
       <AnswerPeerConnection />
       <style jsx global>{`
         html,

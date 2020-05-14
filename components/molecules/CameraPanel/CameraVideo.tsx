@@ -1,9 +1,47 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import * as faceapi from 'face-api.js';
 import { AppDispatch } from '@/store';
 import { landmark } from '@/modules';
 import { useFaceDetect } from '@/components/hooks/useFaceDetect';
 import { CameraHeadposeAngle } from './CameraHeadposeAngle';
+import { KalmanFilter } from '@/libs/KalmanFilter';
+
+type LandmarkName =
+  | 'nose'
+  | 'leftEye'
+  | 'rightEye'
+  | 'jaw'
+  | 'leftMouth'
+  | 'rightMouth'
+  | 'upperLip'
+  | 'lowerLip'
+  | 'leftOutline'
+  | 'rightOutline';
+
+const kfilter = {
+  nose: new KalmanFilter(),
+  leftEye: new KalmanFilter(),
+  rightEye: new KalmanFilter(),
+  jaw: new KalmanFilter(),
+  leftMouth: new KalmanFilter(),
+  rightMouth: new KalmanFilter(),
+  upperLip: new KalmanFilter(),
+  lowerLip: new KalmanFilter(),
+  leftOutline: new KalmanFilter(),
+  rightOutline: new KalmanFilter(),
+};
+
+function formatPoint(
+  name: LandmarkName,
+  point?: faceapi.Point
+): [number, number] | undefined {
+  if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
+    return undefined;
+  }
+  const [x, y] = kfilter[name].filter([point.x, point.y]);
+  return [x, y];
+}
 
 type CameraVideoProps = {
   active: boolean;
@@ -20,6 +58,7 @@ export const CameraVideo: React.FC<CameraVideoProps> = (props) => {
     points,
     videoDomSize,
     isLandscapeVideoStream,
+    renderCount,
     createStream,
     detect,
     stopDetect,
@@ -35,16 +74,29 @@ export const CameraVideo: React.FC<CameraVideoProps> = (props) => {
 
   React.useEffect(
     () => {
-      dispatch(landmark.actions.updatePoints(points));
+      dispatch(
+        landmark.actions.updatePoints({
+          nose: formatPoint('nose', points.nose),
+          leftEye: formatPoint('leftEye', points.leftEye),
+          rightEye: formatPoint('rightEye', points.rightEye),
+          jaw: formatPoint('jaw', points.jaw),
+          leftMouth: formatPoint('leftMouth', points.leftMouth),
+          rightMouth: formatPoint('rightMouth', points.rightMouth),
+          upperLip: formatPoint('upperLip', points.upperLip),
+          lowerLip: formatPoint('lowerLip', points.lowerLip),
+          leftOutline: formatPoint('leftOutline', points.leftOutline),
+          rightOutline: formatPoint('rightOutline', points.rightOutline),
+        })
+      );
     },
     /* eslint-disable react-hooks/exhaustive-deps */
-    [points]
+    [points, renderCount]
   );
 
   React.useEffect(
     () => {
       if (props.active) {
-        createStream().then(() => detect());
+        createStream().then(() => detect(0));
       } else {
         videoRef.current && stopDetect(videoRef.current);
       }
